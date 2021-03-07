@@ -1,8 +1,8 @@
 <?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName
 /**
- * Plugin Name: On this day
+ * Plugin Name: Posts On This Day
  * Plugin URI: https://jeremy.hu
- * Description: A widget to display posts from past years
+ * Description: Widget to display a list of posts published "on this day" in years past. A good little bit of nostalgia for your blog.
  * Author: Jeremy Herve
  * Version: 1.1.2
  * Author URI: https://jeremy.hu
