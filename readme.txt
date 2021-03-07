@@ -1,7 +1,7 @@
 === Posts On This Day ===
 Contributors: jeherve
 Tags: widget, on this day
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 Requires at least: 5.6
 Requires PHP: 5.6
 Tested up to: 5.7
@@ -36,7 +36,11 @@ You have 2 ways to do so.
 
 == Changelog ==
 
+## [1.1.3] - 2021-03-07
+
+* Update plugin URI for public release.
+
 ## [1.1.2] - 2021-03-07
 
-* Initial public release
+* Initial public release.
 
