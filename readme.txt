@@ -5,6 +5,8 @@ Stable tag: 1.1.3
 Requires at least: 5.6
 Requires PHP: 5.6
 Tested up to: 5.7
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Widget to display a list of posts published "on this day" in years past. A good little bit of nostalgia for your blog.
 
