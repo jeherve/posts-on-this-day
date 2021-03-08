@@ -4,7 +4,7 @@
  * Plugin URI: https://jeremy.hu/my-plugins/posts-on-this-day/
  * Description: Widget to display a list of posts published "on this day" in years past. A good little bit of nostalgia for your blog.
  * Author: Jeremy Herve
- * Version: 1.4.0
+ * Version: 1.4.1
  * Author URI: https://jeremy.hu
  * License: GPL2+
  * Text Domain: posts-on-this-day
@@ -102,10 +102,10 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 					foreach ( $ids as $id ) {
 						echo $this->display_post( $id, $instance ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}
-				}
-
-				foreach ( $ids as $id ) {
-					echo $this->display_post( $id, $instance ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				} else {
+					foreach ( $ids as $id ) {
+						echo $this->display_post( $id, $instance ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					}
 				}
 			}
 
