@@ -20,6 +20,10 @@ This widget, just like Google Photos does, will give you a list of posts that we
 - whether you'd like to display thumbnails for those posts.
 - whether you'd like to group your posts by year.
 
+== Credits ==
+
+* Banner image: [@rirri01](https://unsplash.com/@rirri01)
+
 == Installation ==
 
 * The usual. Go to Plugins > Add New, search, and install.
