@@ -4,7 +4,7 @@
  * Plugin URI: https://jeremy.hu/my-plugins/posts-on-this-day/
  * Description: Widget to display a list of posts published "on this day" in years past. A good little bit of nostalgia for your blog.
  * Author: Jeremy Herve
- * Version: 1.1.3
+ * Version: 1.2.0
  * Author URI: https://jeremy.hu
  * License: GPL2+
  * Text Domain: posts-on-this-day
@@ -51,6 +51,20 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 	}
 
 	/**
+	 * Array of default widget settings.
+	 *
+	 * @return array Array of default values for the Widget's options
+	 */
+	private function defaults() {
+		return array(
+			'title'           => '',
+			'max'             => 10,
+			'back'            => 10,
+			'show_thumbnails' => true,
+		);
+	}
+
+	/**
 	 * Front-end display of widget.
 	 *
 	 * @see WP_Widget::widget()
@@ -61,13 +75,10 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 	public function widget( $args, $instance ) {
 		echo $args['before_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
+		// Defaults.
 		$instance = wp_parse_args(
 			$instance,
-			array(
-				'title' => '',
-				'max'   => 10,
-				'back'  => 10,
-			)
+			$this->defaults()
 		);
 
 		// Display posts.
@@ -84,7 +95,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 			echo '<div class="posts_on_this_day">';
 
 			foreach ( $posts as $id ) {
-				echo $this->display_post( $id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo $this->display_post( $id, $instance ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 
 			// Close markup.
@@ -109,6 +120,10 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 
 		$instance['title'] = wp_kses( $new_instance['title'], array() );
 
+		/*
+		 * Maximum number of posts to show.
+		 * Default to 10, max 20.
+		 */
 		$max = (int) $new_instance['max'];
 		if ( $max ) {
 			$instance['max'] = min( $max, 20 );
@@ -116,12 +131,21 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 			$instance['max'] = 10;
 		}
 
+		/*
+		 * How many years back should we go?
+		 * Default to 10, max 20.
+		 */
 		$back = (int) $new_instance['back'];
 		if ( $back ) {
 			$instance['back'] = min( $back, 20 );
 		} else {
 			$instance['back'] = 10;
 		}
+
+		// Should we show thumbnails?
+		$instance['show_thumbnails'] = isset( $new_instance['show_thumbnails'] )
+			? (bool) $new_instance['show_thumbnails']
+			: false;
 
 		return $instance;
 	}
@@ -137,11 +161,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 		// Defaults.
 		$instance = wp_parse_args(
 			(array) $instance,
-			array(
-				'title' => '',
-				'max'   => 10,
-				'back'  => 10,
-			)
+			$this->defaults()
 		);
 
 		printf(
@@ -166,6 +186,14 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 			esc_html__( 'How many years back do you want to look for posts?', 'posts-on-this-day' ),
 			esc_attr( $this->get_field_name( 'back' ) ),
 			esc_attr( $instance['back'] )
+		);
+
+		printf(
+			'<p><input id="%1$s" name="%3$s" type="checkbox" value="1" %4$s /><label for="%1$s">%2$s</label></p>',
+			esc_attr( $this->get_field_id( 'show_thumbnails' ) ),
+			esc_html__( 'Show thumbnails', 'posts-on-this-day' ),
+			esc_attr( $this->get_field_name( 'show_thumbnails' ) ),
+			checked( $instance['show_thumbnails'], 1, false )
 		);
 	}
 
@@ -269,17 +297,18 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 	/**
 	 * Display a single post.
 	 *
-	 * @param int $id Post id.
+	 * @param int   $id       Post id.
+	 * @param array $instance Saved widget options.
 	 *
 	 * @return string $markup Markup for a single post.
 	 */
-	private function display_post( $id ) {
+	private function display_post( $id, $instance ) {
 		$markup = sprintf(
 			'<div class="posts_on_this_day__article"><a href="%2$s">%4$s</a><div class="posts_on_this_day__title"><a href="%2$s">%3$s (%1$s)</a></div></div>',
 			esc_html( get_the_date( 'Y', $id ) ),
 			esc_url( get_permalink( $id ) ),
 			esc_html( get_the_title( $id ) ),
-			get_the_post_thumbnail( $id, 'medium', array( 'class' => 'posts_on_this_day__image' ) )
+			( (bool) $instance['show_thumbnails'] ? get_the_post_thumbnail( $id, 'medium', array( 'class' => 'posts_on_this_day__image' ) ) : '' )
 		);
 
 		/**
@@ -287,9 +316,10 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 		 *
 		 * @since 1.1.0
 		 *
-		 * @param string $markup Final markup.
-		 * @param int    $id     Post ID.
+		 * @param string $markup   Final markup.
+		 * @param int    $id       Post ID.
+		 * @param array  $instance Saved widget options.
 		 */
-		return apply_filters( 'jeherve_posts_on_this_day_post_markup', $markup, $id );
+		return apply_filters( 'jeherve_posts_on_this_day_post_markup', $markup, $id, $instance );
 	}
 } // Class Posts_On_This_Day_Widget

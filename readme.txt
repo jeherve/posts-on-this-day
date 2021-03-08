@@ -1,7 +1,7 @@
 === Posts On This Day ===
 Contributors: jeherve
 Tags: widget, on this day
-Stable tag: 1.1.3
+Stable tag: 1.2.0
 Requires at least: 5.6
 Requires PHP: 5.6
 Tested up to: 5.7
@@ -17,6 +17,7 @@ If you're familiar with services like Google Photos, TimeHop, or even Facebook M
 This widget, just like Google Photos does, will give you a list of posts that were published at around this time (within a week) in the past years. You can choose:
 - how many years back it should go.
 - how many posts should be displayed at maximum.
+- whether you'd like to display thumbnails for those posts.
 
 == Installation ==
 
@@ -37,6 +38,10 @@ You have 2 ways to do so.
 1. Widget settings
 
 == Changelog ==
+
+## [1.2.0] - 2021-03-08
+
+* Add option to display post thumbnails.
 
 ## [1.1.3] - 2021-03-07
 
