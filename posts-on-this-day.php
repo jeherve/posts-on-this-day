@@ -4,7 +4,7 @@
  * Plugin URI: https://jeremy.hu/my-plugins/posts-on-this-day/
  * Description: Widget to display a list of posts published "on this day" in years past. A good little bit of nostalgia for your blog.
  * Author: Jeremy Herve
- * Version: 1.3.0
+ * Version: 1.4.0
  * Author URI: https://jeremy.hu
  * License: GPL2+
  * Text Domain: posts-on-this-day
@@ -62,6 +62,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 			'back'            => 10,
 			'show_thumbnails' => true,
 			'group_by_year'   => true,
+			'post_types'      => array( 'post' ),
 		);
 	}
 
@@ -162,6 +163,18 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 			? (bool) $new_instance['group_by_year']
 			: false;
 
+		/*
+		 * Post types.
+		 * Let's remove any saved post type that is not among the public post types.
+		 */
+		$allowed_post_types     = array_values( get_post_types( array( 'public' => true ) ) );
+		$instance['post_types'] = (array) $new_instance['post_types'];
+		foreach ( $new_instance['post_types'] as $key => $type ) {
+			if ( ! in_array( $type, $allowed_post_types, true ) ) {
+				unset( $new_instance['post_types'][ $key ] );
+			}
+		}
+
 		return $instance;
 	}
 
@@ -179,6 +192,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 			$this->defaults()
 		);
 
+		// Title.
 		printf(
 			'<p><label for="%1$s">%2$s<input class="widefat" id="%1$s" name="%3$s" type="text" value="%4$s" /></label></p>',
 			esc_attr( $this->get_field_id( 'title' ) ),
@@ -187,6 +201,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 			esc_attr( $instance['title'] )
 		);
 
+		// How many posts to display max?
 		printf(
 			'<p><label for="%1$s">%2$s</label><input class="widefat" id="%1$s" name="%3$s" type="number" min="1" value="%4$s" /></p>',
 			esc_attr( $this->get_field_id( 'max' ) ),
@@ -195,6 +210,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 			esc_attr( $instance['max'] )
 		);
 
+		// How far back should we go.
 		printf(
 			'<p><label for="%1$s">%2$s</label><input class="widefat" id="%1$s" name="%3$s" type="number" min="1" max="20" value="%4$s" /></p>',
 			esc_attr( $this->get_field_id( 'back' ) ),
@@ -203,6 +219,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 			esc_attr( $instance['back'] )
 		);
 
+		// Thumbnails.
 		printf(
 			'<p><input id="%1$s" name="%3$s" type="checkbox" value="1" %4$s /><label for="%1$s">%2$s</label></p>',
 			esc_attr( $this->get_field_id( 'show_thumbnails' ) ),
@@ -211,12 +228,44 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 			checked( $instance['show_thumbnails'], 1, false )
 		);
 
+		// Group by year.
 		printf(
 			'<p><input id="%1$s" name="%3$s" type="checkbox" value="1" %4$s /><label for="%1$s">%2$s</label></p>',
 			esc_attr( $this->get_field_id( 'group_by_year' ) ),
 			esc_html__( 'Group by year', 'posts-on-this-day' ),
 			esc_attr( $this->get_field_name( 'group_by_year' ) ),
 			checked( $instance['group_by_year'], 1, false )
+		);
+
+		/*
+		 * Post types.
+		 *
+		 * First build a checkbox list of the different public post types on the site,
+		 * and check each box that is saved in the widget options.
+		 *
+		 * Then display the actual picker.
+		 */
+		$allowed_post_types = array_values( get_post_types( array( 'public' => true ) ) );
+
+		$post_type_list = '';
+		foreach ( $allowed_post_types as $cpt ) {
+			$is_cpt_selected = in_array( $cpt, (array) $instance['post_types'], true );
+
+			$post_type_list .= sprintf(
+				'<li><label><input value="%2$s" name="%3$s[]" id="%4$s-%2$s" type="checkbox" %5$s />%1$s</label></li>',
+				esc_html( get_post_type_object( $cpt )->labels->name ),
+				esc_attr( $cpt ),
+				esc_attr( $this->get_field_name( 'post_types' ) ),
+				esc_attr( $this->get_field_id( 'post_types' ) ),
+				checked( $is_cpt_selected, true, false )
+			);
+		}
+
+		printf(
+			'<p><label for="%1$s">%2$s</label><ul>%3$s</ul></p>',
+			esc_attr( $this->get_field_id( 'post_types' ) ),
+			esc_html__( 'Pick posts from those post types:', 'posts-on-this-day' ),
+			$post_type_list // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		);
 	}
 
@@ -267,7 +316,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 		$date_query['relation'] = 'OR';
 
 		// Make our query for posts.
-		$posts = $this->query_posts( $date_query, $max );
+		$posts = $this->query_posts( $date_query, $instance );
 
 		set_transient( $transient_key, $posts, DAY_IN_SECONDS );
 
@@ -278,16 +327,16 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 	 * Query for posts matching our date query.
 	 *
 	 * @param array $date_query WP Query date query arguments.
-	 * @param int   $max        Maximum number of posts to look for.
+	 * @param array $instance   Saved widget options.
 	 *
 	 * @return array $posts Multidimensional array of post IDs per year.
 	 */
-	private function query_posts( $date_query, $max ) {
+	private function query_posts( $date_query, $instance ) {
 		$posts = array();
 
 		$args = array(
-			'post_type'      => 'post',
-			'posts_per_page' => $max,
+			'post_type'      => $instance['post_types'],
+			'posts_per_page' => $instance['max'],
 			'date_query'     => $date_query,
 		);
 
