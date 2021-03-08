@@ -4,7 +4,7 @@
  * Plugin URI: https://jeremy.hu/my-plugins/posts-on-this-day/
  * Description: Widget to display a list of posts published "on this day" in years past. A good little bit of nostalgia for your blog.
  * Author: Jeremy Herve
- * Version: 1.2.0
+ * Version: 1.3.0
  * Author URI: https://jeremy.hu
  * License: GPL2+
  * Text Domain: posts-on-this-day
@@ -61,6 +61,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 			'max'             => 10,
 			'back'            => 10,
 			'show_thumbnails' => true,
+			'group_by_year'   => true,
 		);
 	}
 
@@ -94,8 +95,17 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 			// Open markup.
 			echo '<div class="posts_on_this_day">';
 
-			foreach ( $posts as $id ) {
-				echo $this->display_post( $id, $instance ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			foreach ( $posts as $year => $ids ) {
+				if ( $instance['group_by_year'] ) {
+					echo '<h4 class="posts_on_this_day__year">' . esc_html( $year ) . '</h4>';
+					foreach ( $ids as $id ) {
+						echo $this->display_post( $id, $instance ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					}
+				}
+
+				foreach ( $ids as $id ) {
+					echo $this->display_post( $id, $instance ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				}
 			}
 
 			// Close markup.
@@ -147,6 +157,11 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 			? (bool) $new_instance['show_thumbnails']
 			: false;
 
+		// Should we group posts by year?
+		$instance['group_by_year'] = isset( $new_instance['group_by_year'] )
+			? (bool) $new_instance['group_by_year']
+			: false;
+
 		return $instance;
 	}
 
@@ -194,6 +209,14 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 			esc_html__( 'Show thumbnails', 'posts-on-this-day' ),
 			esc_attr( $this->get_field_name( 'show_thumbnails' ) ),
 			checked( $instance['show_thumbnails'], 1, false )
+		);
+
+		printf(
+			'<p><input id="%1$s" name="%3$s" type="checkbox" value="1" %4$s /><label for="%1$s">%2$s</label></p>',
+			esc_attr( $this->get_field_id( 'group_by_year' ) ),
+			esc_html__( 'Group by year', 'posts-on-this-day' ),
+			esc_attr( $this->get_field_name( 'group_by_year' ) ),
+			checked( $instance['group_by_year'], 1, false )
 		);
 	}
 
@@ -246,9 +269,6 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 		// Make our query for posts.
 		$posts = $this->query_posts( $date_query, $max );
 
-		// Make sure we never return more posts than set.
-		$posts = array_slice( $posts, 0, $max );
-
 		set_transient( $transient_key, $posts, DAY_IN_SECONDS );
 
 		return $posts;
@@ -260,7 +280,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 	 * @param array $date_query WP Query date query arguments.
 	 * @param int   $max        Maximum number of posts to look for.
 	 *
-	 * @return array $posts Array of post IDs.
+	 * @return array $posts Multidimensional array of post IDs per year.
 	 */
 	private function query_posts( $date_query, $max ) {
 		$posts = array();
@@ -286,7 +306,8 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 			while ( $query->have_posts() ) {
 				$query->the_post();
 
-				$posts[] = $query->post->ID;
+				$post_year             = get_the_date( 'Y' );
+				$posts[ $post_year ][] = $query->post->ID;
 			}
 			wp_reset_postdata();
 		}
@@ -303,11 +324,19 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 	 * @return string $markup Markup for a single post.
 	 */
 	private function display_post( $id, $instance ) {
+		$title = false === $instance['group_by_year']
+			? sprintf(
+				/* Translators: 1: post title. 2: publication year. */
+				__( '%1$s (%2$s)', 'posts-on-this-day' ),
+				get_the_title( $id ),
+				get_the_date( 'Y', $id )
+			)
+			: get_the_title( $id );
+
 		$markup = sprintf(
-			'<div class="posts_on_this_day__article"><a href="%2$s">%4$s</a><div class="posts_on_this_day__title"><a href="%2$s">%3$s (%1$s)</a></div></div>',
-			esc_html( get_the_date( 'Y', $id ) ),
+			'<div class="posts_on_this_day__article"><a href="%2$s">%3$s</a><div class="posts_on_this_day__title"><a href="%2$s">%1$s</a></div></div>',
+			esc_html( $title ),
 			esc_url( get_permalink( $id ) ),
-			esc_html( get_the_title( $id ) ),
 			( (bool) $instance['show_thumbnails'] ? get_the_post_thumbnail( $id, 'medium', array( 'class' => 'posts_on_this_day__image' ) ) : '' )
 		);
 
