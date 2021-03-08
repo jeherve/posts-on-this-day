@@ -280,8 +280,9 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 		$posts      = array();
 		$date_query = array();
 
-		$max  = ! empty( $instance['max'] ) ? (int) $instance['max'] : 10; // How many posts do we want maximum?
-		$back = ! empty( $instance['back'] ) ? (int) $instance['back'] : 10; // How many years back to we want to go back?
+		$max   = ! empty( $instance['max'] ) ? (int) $instance['max'] : 10; // How many posts do we want maximum?
+		$back  = ! empty( $instance['back'] ) ? (int) $instance['back'] : 10; // How many years back to we want to go back?
+		$types = implode( '-', $instance['post_types'] );
 
 		/*
 		 * Let's attempt to cache data for a day
@@ -289,9 +290,10 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 		 * that we know will return the same result for a day.
 		 */
 		$transient_key = sprintf(
-			'jeherve_posts_on_this_day_%1$d_%2$d',
+			'jeherve_posts_on_this_day_%1$d_%2$d_%3$s',
 			$max,
-			$back
+			$back,
+			esc_attr( $types )
 		);
 
 		$cached_posts = get_transient( $transient_key );
