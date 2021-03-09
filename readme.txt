@@ -15,22 +15,22 @@ Widget to display a list of posts published "on this day" in years past. A good 
 If you're familiar with services like Google Photos, TimeHop, or even Facebook Memories, you most likely enjoyed getting little reminders of what happened in your life in years past. This little widget brings this feature to your site.
 
 This widget, just like Google Photos does, will give you a list of posts that were published at around this time (within a week) in the past years. You can choose:
-- how many years back it should go.
-- how many posts should be displayed at maximum.
-- what post types to pick old posts from.
-- whether you'd like to display thumbnails for those posts.
-- whether you'd like to group your posts by year.
 
-== Credits ==
+* how many years back it should go.
+* how many posts should be displayed at maximum.
+* what post types to pick old posts from.
+* whether you'd like to display thumbnails for those posts.
+* whether you'd like to group your posts by year.
 
-* Banner image: [@rirri01](https://unsplash.com/@rirri01)
+
+Banner image: [@rirri01](https://unsplash.com/@rirri01)
 
 == Installation ==
 
 * The usual. Go to Plugins > Add New, search, and install.
 * You can then go to Appearance > Widgets or Appearance > Customize to set up your widget in one of your widget areas.
 
-== Frequently Asked Questions ==
+== FAQ ==
 
 = I want to customize the look of my widget =
 
