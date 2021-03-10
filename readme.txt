@@ -45,27 +45,27 @@ You have 2 ways to do so.
 
 == Changelog ==
 
-## [1.4.1] - 2021-03-08
+### [1.4.1] - 2021-03-08
 
 * Avoid displaying posts twice.
 
-## [1.4.0] - 2021-03-08
+### [1.4.0] - 2021-03-08
 
 * Add option to pick post types.
 
-## [1.3.0] - 2021-03-08
+### [1.3.0] - 2021-03-08
 
 * Add option to group by year.
 
-## [1.2.0] - 2021-03-08
+### [1.2.0] - 2021-03-08
 
 * Add option to display post thumbnails.
 
-## [1.1.3] - 2021-03-07
+### [1.1.3] - 2021-03-07
 
 * Update plugin URI for public release.
 
-## [1.1.2] - 2021-03-07
+### [1.1.2] - 2021-03-07
 
 * Initial public release.
 
