@@ -1,9 +1,9 @@
 === Posts On This Day ===
 Contributors: jeherve
 Tags: widget, on this day
-Stable tag: 1.4.1
+Stable tag: 1.5.0
 Requires at least: 5.6
-Requires PHP: 5.6
+Requires PHP: 7.1
 Tested up to: 5.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -44,6 +44,11 @@ You have 2 ways to do so.
 1. Widget settings
 
 == Changelog ==
+
+### [1.5.0] - 2021-03-19
+
+* Check for types more strictly.
+* The plugin now requires PHP 7.1.
 
 ### [1.4.1] - 2021-03-08
 
