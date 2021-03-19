@@ -53,6 +53,11 @@ jobs:
         run: |
           composer install --no-dev
 
+      - name: Checking where we stand on the branch.
+        id: check-status
+        run: |
+          git status
+
       - name: Push changes to remote
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
