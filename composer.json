@@ -1,0 +1,44 @@
+{
+	"name": "jeherve/posts-on-this-day",
+	"description": "Widget to display a list of posts published on this day in years past.",
+	"homepage": "https://jeremy.hu/my-plugins/posts-on-this-day/",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
+	"support": {
+		"issues": "https://github.com/jeherve/posts-on-this-day/issues"
+	},
+	"require": {
+		"automattic/jetpack-autoloader": "2.10.0"
+	},
+	"require-dev": {
+		"automattic/jetpack-codesniffer": "2.2.0",
+		"dealerdirect/phpcodesniffer-composer-installer": "0.7.1"
+	},
+	"scripts": {
+		"php:lint": [
+			"Composer\\Config::disableProcessTimeout",
+			"phpcs -p -s"
+		],
+		"phpcs:compatibility": [
+			"@phpcs:lint --standard=./.phpcs.config.xml,PHPCompatibilityWP"
+		],
+		"phpcs:fix": [
+			"Composer\\Config::disableProcessTimeout",
+			"phpcbf -p"
+		],
+		"phpcs:lint": [
+			"Composer\\Config::disableProcessTimeout",
+			"phpcs -p -s"
+		],
+		"phpcs:lint:errors": [
+			"@phpcs:lint --runtime-set ignore_warnings_on_exit 1"
+		]
+	},
+	"autoload": {
+		"classmap": [
+			"src"
+		]
+	},
+	"minimum-stability": "stable",
+	"prefer-stable": true
+}

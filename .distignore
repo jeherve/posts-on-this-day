@@ -6,3 +6,6 @@
 # Files
 .distignore
 .gitignore
+.phpcs.xml.dist
+.editorconfig
+composer.lock
