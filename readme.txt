@@ -45,7 +45,7 @@ You have 2 ways to do so.
 
 == Changelog ==
 
-### [1.5.0] -
+### [1.5.0] - 2021-03-19
 
 * Check for types more strictly.
 * The plugin now requires PHP 7.1.
