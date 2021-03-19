@@ -58,6 +58,16 @@ jobs:
         run: |
           git status
 
+      - name: Allow committing vendor directory
+        id: edit-gitignore
+        run: |
+          sed '/vendor/d' ./.gitignore
+
+      - name: Checking where we stand on the branch now.
+        id: check-status-again
+        run: |
+          git status
+
       - name: Push changes to remote
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
