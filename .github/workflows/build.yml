@@ -74,5 +74,5 @@ jobs:
           commit_user_name: Jeremy's bot
           commit_user_email: jeherve@users.noreply.github.com
           commit_message: 'Build from master'
-          branch: try/build
+          branch: trunk
           push_options: '--force'
