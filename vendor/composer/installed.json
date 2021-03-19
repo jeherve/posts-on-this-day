@@ -1,0 +1,52 @@
+{
+    "packages": [
+        {
+            "name": "automattic/jetpack-autoloader",
+            "version": "v2.10.0",
+            "version_normalized": "2.10.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Automattic/jetpack-autoloader.git",
+                "reference": "6409c42b32ed82aff50869fd0a6a2e5c7a96fbd6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/6409c42b32ed82aff50869fd0a6a2e5c7a96fbd6",
+                "reference": "6409c42b32ed82aff50869fd0a6a2e5c7a96fbd6",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.1 || ^2.0"
+            },
+            "require-dev": {
+                "yoast/phpunit-polyfills": "0.2.0"
+            },
+            "time": "2021-02-09T18:24:48+00:00",
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Automattic\\Jetpack\\Autoloader\\CustomAutoloaderPlugin",
+                "mirror-repo": "Automattic/jetpack-autoloader"
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "classmap": [
+                    "src/AutoloadGenerator.php"
+                ],
+                "psr-4": {
+                    "Automattic\\Jetpack\\Autoloader\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Creates a custom autoloader for a plugin or theme.",
+            "support": {
+                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v2.10.0"
+            },
+            "install-path": "../automattic/jetpack-autoloader"
+        }
+    ],
+    "dev": false,
+    "dev-package-names": []
+}
