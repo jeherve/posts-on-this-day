@@ -9,10 +9,12 @@
  * License: GPL2+
  * Text Domain: posts-on-this-day
  * Requires at least: 5.6
- * Requires PHP: 5.6
+ * Requires PHP: 7.1
  *
  * @package jeherve/posts-on-this-day
  */
+
+declare( strict_types=1 );
 
 namespace Jeherve\Posts_On_This_Day;
 
@@ -55,7 +57,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 	 *
 	 * @return array Array of default values for the Widget's options
 	 */
-	private function defaults() {
+	private function defaults(): array {
 		return array(
 			'title'           => '',
 			'max'             => 10,
@@ -74,7 +76,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 	 * @param array $args     Widget arguments.
 	 * @param array $instance Saved widget options.
 	 */
-	public function widget( $args, $instance ) {
+	public function widget( array $args, array $instance ) {
 		echo $args['before_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 		// Defaults.
@@ -126,7 +128,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 	 *
 	 * @return array Updated safe values to be saved.
 	 */
-	public function update( $new_instance, $old_instance ) {
+	public function update( array $new_instance, array $old_instance ): array {
 		$instance = $old_instance;
 
 		$instance['title'] = wp_kses( $new_instance['title'], array() );
@@ -185,7 +187,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 	 *
 	 * @param array $instance Previously saved values from database.
 	 */
-	public function form( $instance ) {
+	public function form( array $instance ) {
 		// Defaults.
 		$instance = wp_parse_args(
 			(array) $instance,
@@ -276,7 +278,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 	 *
 	 * @return array $posts Array of post IDs.
 	 */
-	private function get_posts( $instance ) {
+	private function get_posts( array $instance ): array {
 		$posts      = array();
 		$date_query = array();
 
@@ -297,7 +299,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 		);
 
 		$cached_posts = get_transient( $transient_key );
-		if ( $cached_posts ) {
+		if ( $cached_posts && is_array( $cached_posts ) ) {
 			return $cached_posts;
 		}
 
@@ -333,7 +335,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 	 *
 	 * @return array $posts Multidimensional array of post IDs per year.
 	 */
-	private function query_posts( $date_query, $instance ) {
+	private function query_posts( array $date_query, array $instance ): array {
 		$posts = array();
 
 		$args = array(
@@ -374,7 +376,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 	 *
 	 * @return string $markup Markup for a single post.
 	 */
-	private function display_post( $id, $instance ) {
+	private function display_post( int $id, array $instance ): ?string {
 		$title = false === $instance['group_by_year']
 			? sprintf(
 				/* Translators: 1: post title. 2: publication year. */
