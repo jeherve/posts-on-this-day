@@ -61,7 +61,7 @@ jobs:
       - name: Allow committing vendor directory
         id: edit-gitignore
         run: |
-          sed '/vendor/d' ./.gitignore
+          sed -i '/vendor/d' ./.gitignore
 
       - name: Checking where we stand on the branch now.
         id: check-status-again
