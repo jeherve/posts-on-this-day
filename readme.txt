@@ -1,7 +1,7 @@
 === Posts On This Day ===
 Contributors: jeherve
 Tags: widget, on this day
-Stable tag: 1.4.1
+Stable tag: 1.5.0
 Requires at least: 5.6
 Requires PHP: 7.1
 Tested up to: 5.7
@@ -45,7 +45,7 @@ You have 2 ways to do so.
 
 == Changelog ==
 
-### Latest
+### [1.5.0] -
 
 * Check for types more strictly.
 * The plugin now requires PHP 7.1.
