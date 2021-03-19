@@ -1,0 +1,62 @@
+name: Build
+on:
+  push:
+    branches:
+      - master # Every time a PR is merged to master.
+
+env:
+  COMPOSER_ROOT_VERSION: "dev-master"
+
+jobs:
+  build:
+    name: Build project to trunk
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Read PHP version
+        id: versions
+        run: |
+          echo "::set-output name=php-version::7.4"
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ steps.versions.outputs.php-version }}
+          tools: composer
+          extensions: mysql, imagick
+          coverage: none
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - name: Use composer cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Tool versions
+        run: |
+          which php
+          php --version
+          which composer
+          composer --version
+
+      - name: Build
+        id: build
+        run: |
+          composer install --no-dev
+
+      - name: push changes to remote
+        run: |
+          git config --global user.name "Jeremy's bot"
+          git config --global user.email "jeherve@users.noreply.github.com"
+
+          git add **\<pathspec\>** git commit -m "commit message"
+          git push -u origin try/build
