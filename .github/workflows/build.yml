@@ -53,11 +53,10 @@ jobs:
         run: |
           composer install --no-dev
 
-      - name: push changes to remote
-        run: |
-          git config --global user.name "Jeremy's bot"
-          git config --global user.email "jeherve@users.noreply.github.com"
-
-          git add .
-          git commit -m "Build from master"
-          git push -f origin try/build
+      - name: Push changes to remote
+        uses: EndBug/add-and-commit@v7
+        with:
+          author_name: Jeremy's bot
+          author_email: jeherve@users.noreply.github.com
+          message: 'Build from master'
+          branch: try/build
