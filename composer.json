@@ -12,15 +12,15 @@
 	},
 	"require-dev": {
 		"automattic/jetpack-codesniffer": "2.2.0",
-		"dealerdirect/phpcodesniffer-composer-installer": "0.7.1"
+		"dealerdirect/phpcodesniffer-composer-installer": "0.7.1",
+		"php-parallel-lint/php-parallel-lint": "1.2.0"
 	},
 	"scripts": {
 		"php:lint": [
-			"Composer\\Config::disableProcessTimeout",
-			"phpcs -p -s"
+			"vendor/bin/parallel-lint --exclude vendor ."
 		],
 		"phpcs:compatibility": [
-			"@phpcs:lint --standard=./.phpcs.config.xml,PHPCompatibilityWP"
+			"@phpcs:lint --standard=./.phpcs.xml.dist,PHPCompatibilityWP"
 		],
 		"phpcs:fix": [
 			"Composer\\Config::disableProcessTimeout",
