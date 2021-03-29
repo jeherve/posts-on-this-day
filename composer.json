@@ -17,8 +17,7 @@
 	},
 	"scripts": {
 		"php:lint": [
-			"printf '\\e[30;43m`composer php:lint` now lints. If you want to run phpcs, use `composer phpcs:lint`.\\e[0m\\n'",
-			".github/tools/parallel-lint.sh"
+			"vendor/bin/parallel-lint --exclude vendor ."
 		],
 		"phpcs:compatibility": [
 			"@phpcs:lint --standard=./.phpcs.config.xml,PHPCompatibilityWP"
