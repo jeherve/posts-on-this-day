@@ -108,7 +108,7 @@ jobs:
 
       - name: Run phpcs
         run: |
-          composer phpcs:lint:required -- --report=emacs --standard=.github/files/php-linting-phpcs.xml
+          composer phpcs:lint -- --report=emacs --standard=.github/files/php-linting-phpcs.xml
 
   ### Runs PHPCompatibility over all PHP files.
   # Local equivalent: `composer phpcs:compatibility`
