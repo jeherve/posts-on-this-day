@@ -20,7 +20,7 @@
 			"vendor/bin/parallel-lint --exclude vendor ."
 		],
 		"phpcs:compatibility": [
-			"@phpcs:lint --standard=./.phpcs.config.xml,PHPCompatibilityWP"
+			"@phpcs:lint --standard=./.phpcs.xml.dist,PHPCompatibilityWP"
 		],
 		"phpcs:fix": [
 			"Composer\\Config::disableProcessTimeout",
