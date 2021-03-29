@@ -11,9 +11,11 @@
 		"automattic/jetpack-autoloader": "2.10.0"
 	},
 	"require-dev": {
+		"automattic/wordbless": "dev-master",
 		"automattic/jetpack-codesniffer": "2.2.0",
 		"dealerdirect/phpcodesniffer-composer-installer": "0.7.1",
-		"php-parallel-lint/php-parallel-lint": "1.2.0"
+		"php-parallel-lint/php-parallel-lint": "1.2.0",
+		"yoast/phpunit-polyfills": "0.2.0"
 	},
 	"scripts": {
 		"php:lint": [
@@ -32,7 +34,15 @@
 		],
 		"phpcs:lint:errors": [
 			"@phpcs:lint --runtime-set ignore_warnings_on_exit 1"
-		]
+		],
+		"phpunit": [
+			"@composer update",
+			"./vendor/phpunit/phpunit/phpunit --colors=always"
+		],
+		"test-php": [
+			"@composer phpunit"
+		],
+		"post-update-cmd": "php -r \"copy('vendor/automattic/wordbless/src/dbless-wpdb.php', 'wordpress/wp-content/db.php');\""
 	},
 	"autoload": {
 		"classmap": [
