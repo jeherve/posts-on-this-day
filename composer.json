@@ -8,7 +8,7 @@
 		"issues": "https://github.com/jeherve/posts-on-this-day/issues"
 	},
 	"require": {
-		"automattic/jetpack-autoloader": "2.10.0"
+		"automattic/jetpack-autoloader": "2.10.1"
 	},
 	"require-dev": {
 		"automattic/jetpack-codesniffer": "2.2.0",
