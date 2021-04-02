@@ -45,6 +45,10 @@ You have 2 ways to do so.
 
 == Changelog ==
 
+### [1.5.1] -
+
+* Improve the display of each post when no post thumbnail can be found.
+
 ### [1.5.0] - 2021-03-19
 
 * Check for types more strictly.
