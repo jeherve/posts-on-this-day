@@ -1,7 +1,7 @@
 === Posts On This Day ===
 Contributors: jeherve
 Tags: widget, on this day
-Stable tag: 1.5.0
+Stable tag: 1.5.1
 Requires at least: 5.6
 Requires PHP: 7.1
 Tested up to: 5.7
@@ -21,6 +21,7 @@ This widget, just like Google Photos does, will give you a list of posts that we
 * what post types to pick old posts from.
 * whether you'd like to display thumbnails for those posts.
 * whether you'd like to group your posts by year.
+* whether you'd like to look for posts on the exact day, years past, or around this time (within a week).
 
 
 Banner image: [@rirri01](https://unsplash.com/@rirri01)
@@ -45,8 +46,9 @@ You have 2 ways to do so.
 
 == Changelog ==
 
-### [1.5.1] -
+### [1.5.1] - 2021-04-13
 
+* Add an option to only search for posts on the exact day, years past.
 * Improve the display of each post when no post thumbnail can be found.
 
 ### [1.5.0] - 2021-03-19

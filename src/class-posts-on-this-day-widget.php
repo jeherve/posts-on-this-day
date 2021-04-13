@@ -43,6 +43,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 			'show_thumbnails' => true,
 			'group_by_year'   => true,
 			'post_types'      => array( 'post' ),
+			'exact_match'     => false,
 		);
 	}
 
@@ -142,6 +143,11 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 		// Should we group posts by year?
 		$instance['group_by_year'] = isset( $new_instance['group_by_year'] )
 			? (bool) $new_instance['group_by_year']
+			: false;
+
+		// Should we only look for matching posts on the exact date years back?
+		$instance['exact_match'] = isset( $new_instance['exact_match'] )
+			? (bool) $new_instance['exact_match']
 			: false;
 
 		/*
@@ -247,6 +253,16 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 			esc_attr( $this->get_field_id( 'post_types' ) ),
 			esc_html__( 'Pick posts from those post types:', 'posts-on-this-day' ),
 			$post_type_list // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		);
+
+		// Should we look for posts on the exact date, or around that date years past.
+		printf(
+			'<p><input id="%1$s" name="%3$s" type="checkbox" value="1" %4$s /><label for="%1$s">%2$s</label><em>%5$s</em></p>',
+			esc_attr( $this->get_field_id( 'exact_match' ) ),
+			esc_html__( 'Are you only interested in posts that were published on that exact day?', 'posts-on-this-day' ),
+			esc_attr( $this->get_field_name( 'exact_match' ) ),
+			checked( $instance['exact_match'], 1, false ),
+			esc_html__( 'By default, the widget will look for posts that were published around that day (within a week) in years past.', 'jetpack' )
 		);
 	}
 } // Class Posts_On_This_Day_Widget
