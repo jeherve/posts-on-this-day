@@ -4,32 +4,39 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "438d655c6054066ae34b80028e173812",
+    "content-hash": "823f9d3ecec8c571f73f9947782ddf78",
     "packages": [
         {
             "name": "automattic/jetpack-autoloader",
-            "version": "v2.10.0",
+            "version": "2.10.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Automattic/jetpack-autoloader.git",
-                "reference": "6409c42b32ed82aff50869fd0a6a2e5c7a96fbd6"
+                "reference": "20393c4677765c3e737dcb5aee7a3f7b90dce4b3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/6409c42b32ed82aff50869fd0a6a2e5c7a96fbd6",
-                "reference": "6409c42b32ed82aff50869fd0a6a2e5c7a96fbd6",
+                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/20393c4677765c3e737dcb5aee7a3f7b90dce4b3",
+                "reference": "20393c4677765c3e737dcb5aee7a3f7b90dce4b3",
                 "shasum": ""
             },
             "require": {
                 "composer-plugin-api": "^1.1 || ^2.0"
             },
             "require-dev": {
+                "automattic/jetpack-changelogger": "^1.1",
                 "yoast/phpunit-polyfills": "0.2.0"
             },
             "type": "composer-plugin",
             "extra": {
                 "class": "Automattic\\Jetpack\\Autoloader\\CustomAutoloaderPlugin",
-                "mirror-repo": "Automattic/jetpack-autoloader"
+                "mirror-repo": "Automattic/jetpack-autoloader",
+                "changelogger": {
+                    "link-template": "https://github.com/Automattic/jetpack-autoloader/compare/v${old}...v${new}"
+                },
+                "branch-alias": {
+                    "dev-master": "2.10.x-dev"
+                }
             },
             "autoload": {
                 "classmap": [
@@ -45,9 +52,9 @@
             ],
             "description": "Creates a custom autoloader for a plugin or theme.",
             "support": {
-                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v2.10.0"
+                "source": "https://github.com/Automattic/jetpack-autoloader/tree/2.10.1"
             },
-            "time": "2021-02-09T18:24:48+00:00"
+            "time": "2021-03-30T15:15:59+00:00"
         }
     ],
     "packages-dev": [
@@ -716,21 +723,21 @@
         },
         {
             "name": "php-parallel-lint/php-parallel-lint",
-            "version": "v1.2.0",
+            "version": "v1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-parallel-lint/PHP-Parallel-Lint.git",
-                "reference": "474f18bc6cc6aca61ca40bfab55139de614e51ca"
+                "reference": "772a954e5f119f6f5871d015b23eabed8cbdadfb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-parallel-lint/PHP-Parallel-Lint/zipball/474f18bc6cc6aca61ca40bfab55139de614e51ca",
-                "reference": "474f18bc6cc6aca61ca40bfab55139de614e51ca",
+                "url": "https://api.github.com/repos/php-parallel-lint/PHP-Parallel-Lint/zipball/772a954e5f119f6f5871d015b23eabed8cbdadfb",
+                "reference": "772a954e5f119f6f5871d015b23eabed8cbdadfb",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "php": ">=5.4.0"
+                "php": ">=5.3.0"
             },
             "replace": {
                 "grogy/php-parallel-lint": "*",
@@ -739,7 +746,7 @@
             "require-dev": {
                 "nette/tester": "^1.3 || ^2.0",
                 "php-parallel-lint/php-console-highlighter": "~0.3",
-                "squizlabs/php_codesniffer": "~3.0"
+                "squizlabs/php_codesniffer": "^3.5"
             },
             "suggest": {
                 "php-parallel-lint/php-console-highlighter": "Highlight syntax in code snippet"
@@ -767,9 +774,9 @@
             "homepage": "https://github.com/php-parallel-lint/PHP-Parallel-Lint",
             "support": {
                 "issues": "https://github.com/php-parallel-lint/PHP-Parallel-Lint/issues",
-                "source": "https://github.com/php-parallel-lint/PHP-Parallel-Lint/tree/master"
+                "source": "https://github.com/php-parallel-lint/PHP-Parallel-Lint/tree/v1.3.0"
             },
-            "time": "2020-04-04T12:18:32+00:00"
+            "time": "2021-04-07T14:42:48+00:00"
         },
         {
             "name": "phpcompatibility/php-compatibility",
