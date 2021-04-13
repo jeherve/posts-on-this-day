@@ -29,19 +29,19 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => 'd565b348fdb0e55774c332c9c15393f2944960fa',
+    'reference' => 'e498e51bfb143f3eb0d884b1de50781c663cf6ea',
     'name' => 'jeherve/posts-on-this-day',
   ),
   'versions' => 
   array (
     'automattic/jetpack-autoloader' => 
     array (
-      'pretty_version' => 'v2.10.0',
-      'version' => '2.10.0.0',
+      'pretty_version' => '2.10.1',
+      'version' => '2.10.1.0',
       'aliases' => 
       array (
       ),
-      'reference' => '6409c42b32ed82aff50869fd0a6a2e5c7a96fbd6',
+      'reference' => '20393c4677765c3e737dcb5aee7a3f7b90dce4b3',
     ),
     'jeherve/posts-on-this-day' => 
     array (
@@ -50,7 +50,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => 'd565b348fdb0e55774c332c9c15393f2944960fa',
+      'reference' => 'e498e51bfb143f3eb0d884b1de50781c663cf6ea',
     ),
   ),
 );

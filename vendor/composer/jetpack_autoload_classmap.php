@@ -6,26 +6,6 @@ $vendorDir = dirname(__DIR__);
 $baseDir   = dirname($vendorDir);
 
 return array(
-	'Automattic\\Jetpack\\Autoloader\\AutoloadGenerator' => array(
-		'version' => '2.10.0.0',
-		'path'    => $vendorDir . '/automattic/jetpack-autoloader/src/AutoloadGenerator.php'
-	),
-	'Automattic\\Jetpack\\Autoloader\\AutoloadProcessor' => array(
-		'version' => '2.10.0.0',
-		'path'    => $vendorDir . '/automattic/jetpack-autoloader/src/AutoloadProcessor.php'
-	),
-	'Automattic\\Jetpack\\Autoloader\\AutoloadFileWriter' => array(
-		'version' => '2.10.0.0',
-		'path'    => $vendorDir . '/automattic/jetpack-autoloader/src/AutoloadFileWriter.php'
-	),
-	'Automattic\\Jetpack\\Autoloader\\CustomAutoloaderPlugin' => array(
-		'version' => '2.10.0.0',
-		'path'    => $vendorDir . '/automattic/jetpack-autoloader/src/CustomAutoloaderPlugin.php'
-	),
-	'Automattic\\Jetpack\\Autoloader\\ManifestGenerator' => array(
-		'version' => '2.10.0.0',
-		'path'    => $vendorDir . '/automattic/jetpack-autoloader/src/ManifestGenerator.php'
-	),
 	'Jeherve\\Posts_On_This_Day\\Query' => array(
 		'version' => 'dev-trunk',
 		'path'    => $baseDir . '/src/class-query.php'
@@ -37,5 +17,9 @@ return array(
 	'Jeherve\\Posts_On_This_Day\\Posts_On_This_Day_Widget' => array(
 		'version' => 'dev-trunk',
 		'path'    => $baseDir . '/src/class-posts-on-this-day-widget.php'
+	),
+	'Automattic\\Jetpack\\Autoloader\\AutoloadGenerator' => array(
+		'version' => '2.10.1.0',
+		'path'    => $vendorDir . '/automattic/jetpack-autoloader/src/AutoloadGenerator.php'
 	),
 );

@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit422afba4b62af4b4e41bd19d15149a7b
+class ComposerStaticInit50e86478a1f684a3272d4256e57f3bc6
 {
     public static $prefixLengthsPsr4 = array (
         'A' => 
@@ -21,11 +21,7 @@ class ComposerStaticInit422afba4b62af4b4e41bd19d15149a7b
     );
 
     public static $classMap = array (
-        'Automattic\\Jetpack\\Autoloader\\AutoloadFileWriter' => __DIR__ . '/..' . '/automattic/jetpack-autoloader/src/AutoloadFileWriter.php',
         'Automattic\\Jetpack\\Autoloader\\AutoloadGenerator' => __DIR__ . '/..' . '/automattic/jetpack-autoloader/src/AutoloadGenerator.php',
-        'Automattic\\Jetpack\\Autoloader\\AutoloadProcessor' => __DIR__ . '/..' . '/automattic/jetpack-autoloader/src/AutoloadProcessor.php',
-        'Automattic\\Jetpack\\Autoloader\\CustomAutoloaderPlugin' => __DIR__ . '/..' . '/automattic/jetpack-autoloader/src/CustomAutoloaderPlugin.php',
-        'Automattic\\Jetpack\\Autoloader\\ManifestGenerator' => __DIR__ . '/..' . '/automattic/jetpack-autoloader/src/ManifestGenerator.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Jeherve\\Posts_On_This_Day\\Display' => __DIR__ . '/../..' . '/src/class-display.php',
         'Jeherve\\Posts_On_This_Day\\Posts_On_This_Day_Widget' => __DIR__ . '/../..' . '/src/class-posts-on-this-day-widget.php',
@@ -35,9 +31,9 @@ class ComposerStaticInit422afba4b62af4b4e41bd19d15149a7b
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit422afba4b62af4b4e41bd19d15149a7b::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit422afba4b62af4b4e41bd19d15149a7b::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit422afba4b62af4b4e41bd19d15149a7b::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit50e86478a1f684a3272d4256e57f3bc6::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit50e86478a1f684a3272d4256e57f3bc6::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit50e86478a1f684a3272d4256e57f3bc6::$classMap;
 
         }, null, ClassLoader::class);
     }

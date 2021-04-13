@@ -1,1 +1,6 @@
 # Folders
+wordpress/
+
+# Files
+.phpunit.result.cache
+**/.DS_Store

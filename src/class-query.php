@@ -28,9 +28,10 @@ class Query {
 		$posts      = array();
 		$date_query = array();
 
-		$max   = ! empty( $instance['max'] ) ? (int) $instance['max'] : 10; // How many posts do we want maximum?
-		$back  = ! empty( $instance['back'] ) ? (int) $instance['back'] : 10; // How many years back to we want to go back?
-		$types = implode( '-', $instance['post_types'] );
+		$max         = ! empty( $instance['max'] ) ? (int) $instance['max'] : 10; // How many posts do we want maximum?
+		$back        = ! empty( $instance['back'] ) ? (int) $instance['back'] : 10; // How many years back to we want to go back?
+		$types       = implode( '-', $instance['post_types'] );
+		$exact_match = ! empty( $instance['exact_match'] ) ? (bool) $instance['exact_match'] : false;
 
 		/*
 		 * Let's attempt to cache data for a day
@@ -38,10 +39,11 @@ class Query {
 		 * that we know will return the same result for a day.
 		 */
 		$transient_key = sprintf(
-			'jeherve_posts_on_this_day_%1$d_%2$d_%3$s',
+			'jeherve_posts_on_this_day_%1$d_%2$d_%3$s_%4$s',
 			$max,
 			$back,
-			esc_attr( $types )
+			esc_attr( $types ),
+			( true === $exact_match ? 'exact' : 'aweek' )
 		);
 
 		$cached_posts = get_transient( $transient_key );
@@ -54,10 +56,25 @@ class Query {
 		while ( $back >= $i ) {
 			$today         = new DateTime();
 			$date_interval = sprintf( 'P%dY', $i );
-			$date_query[]  = array(
+
+			// This is either a week before, or the same day if you've chosen exact matching.
+			$after_interval = true === $exact_match
+				? 'P0D'
+				: 'P7D';
+
+			// Build the query for year iteration $i.
+			$this_year_query = array(
 				'before' => $today->sub( new DateInterval( $date_interval ) )->format( 'Y-m-d' ),
-				'after'  => $today->sub( new DateInterval( 'P7D' ) )->format( 'Y-m-d' ),
+				'after'  => $today->sub( new DateInterval( $after_interval ) )->format( 'Y-m-d' ),
 			);
+
+			// If we're doing an exact match, we need to be inclusive since we'll be looking for posts before and after the same date.
+			if ( true === $exact_match ) {
+				$this_year_query['inclusive'] = true;
+			}
+
+			// Add that year to the over date query args.
+			$date_query[] = $this_year_query;
 
 			$i++;
 		}
