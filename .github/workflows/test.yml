@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    name: "PHPUnit ${{ matrix.php }} - WP ${{ matrix.wp }}"
+    name: PHPUnit (${{ matrix.php-versions }})
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental }}
     timeout-minutes: 3  # Successful runs seem to take ~1 minute
