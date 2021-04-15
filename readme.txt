@@ -1,7 +1,7 @@
 === Posts On This Day ===
 Contributors: jeherve
 Tags: widget, on this day
-Stable tag: 1.5.1
+Stable tag: 1.5.2
 Requires at least: 5.6
 Requires PHP: 7.1
 Tested up to: 5.7
@@ -45,6 +45,10 @@ You have 2 ways to do so.
 1. Widget settings
 
 == Changelog ==
+
+### [1.5.2] - 2021-04-15
+
+* Caching: cache data until midnight of the same day, instead of caching it for 24 hours.
 
 ### [1.5.1] - 2021-04-13
 
