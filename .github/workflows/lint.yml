@@ -52,18 +52,6 @@ jobs:
           which jq
           jq --version
 
-      # On PHP >= 8.0, PHPUnit 7.5+ is needed, no matter what.
-      - name: Determine supported PHPUnit version
-        id: set_phpunit
-        run: |
-          if [[ "matrix.php-versions" > "8.0" ]]; then
-            echo '::set-output name=PHPUNIT::"phpunit/phpunit=7.5.*" --ignore-platform-reqs'
-          else
-            echo '::set-output name=PHPUNIT::"phpunit/phpunit=5.7.* || 6.5.* || 7.5.*"'
-          fi
-      - name: 'Composer: set up PHPUnit'
-        run: composer global require ${{ steps.set_phpunit.outputs.PHPUNIT }}
-
       - name: Install dependencies
         run: |
           # Install stuff ignoring platform reqs.
