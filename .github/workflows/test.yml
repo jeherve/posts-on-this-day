@@ -1,9 +1,6 @@
 name: Unit Tests
 
-on:
-  # Run on all pushes and on all pull requests.
-  push:
-  pull_request:
+on: pull_request
 
 jobs:
   test:
