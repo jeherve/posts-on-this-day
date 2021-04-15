@@ -3,6 +3,7 @@
 /.git
 /.github
 /tests
+/wordpress
 
 # Files
 .distignore

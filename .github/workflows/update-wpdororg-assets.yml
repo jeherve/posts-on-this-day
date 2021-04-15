@@ -5,10 +5,23 @@ on:
     - trunk
 jobs:
   trunk:
-    name: Push to trun
+    name: Push to trunk
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 7.4
+        tools: composer
+        extensions: mysql, imagick
+        coverage: none
+
+    - name: Install dependencies
+      run: |
+        composer install --no-dev
+
     - name: WordPress.org plugin asset/readme update
       uses: 10up/action-wordpress-plugin-asset-update@stable
       env:

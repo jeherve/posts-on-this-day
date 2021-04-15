@@ -1,16 +1,29 @@
 # This workflow automatically updates the plugin on WordPress.org
-# when a tag is pushed to this repo.
 name: Deploy to WordPress.org
 on:
-  push:
-    tags:
-    - "*"
+  # Only trigger when a release is published (and not a pre-release) in the GitHub repo.
+  release:
+    types: [published]
+
 jobs:
   tag:
-    name: New tag
+    name: Deploy new tag to WordPress.org
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 7.4
+        tools: composer
+        extensions: mysql, imagick
+        coverage: none
+
+    - name: Install dependencies
+      run: |
+        composer install --no-dev
+
     - name: WordPress Plugin Deploy
       uses: 10up/action-wordpress-plugin-deploy@stable
       env:
