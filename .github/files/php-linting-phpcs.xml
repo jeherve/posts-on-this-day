@@ -13,4 +13,7 @@
 	<rule ref="PHPCompatibilityWP">
 		<exclude name="PHPCompatibility"/>
 	</rule>
+
+	<exclude-pattern>/vendor/*</exclude-pattern>
+	<exclude-pattern>/wordpress/*</exclude-pattern>
 </ruleset>

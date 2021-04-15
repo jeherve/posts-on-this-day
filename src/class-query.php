@@ -85,7 +85,7 @@ class Query {
 		// Make our query for posts.
 		$posts = $this->query_posts( $date_query, $instance );
 
-		set_transient( $transient_key, $posts, DAY_IN_SECONDS );
+		set_transient( $transient_key, $posts, self::get_seconds_left_in_day() );
 
 		return $posts;
 	}
@@ -129,5 +129,37 @@ class Query {
 		}
 
 		return $posts;
+	}
+
+	/**
+	 * Get the number of seconds left in the day.
+	 *
+	 * We want to create a transient that will expire at midnight on our day,
+	 * so let's generate how many seconds are left betwwen the time the transient is generated
+	 * and midnight, in the timezone of the site.
+	 *
+	 * @return int $seconds Number of seconds left until midnight.
+	 */
+	public static function get_seconds_left_in_day(): int {
+		$time_tonight = (int) strtotime( 'today 24:00' );
+		$time_now     = (int) current_time( 'timestamp' ); // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested -- we specifically want the current timestamp.
+
+		// Seconds left until midnight.
+		$seconds_remaining = $time_tonight - $time_now;
+
+		/*
+		 * Set a default fallback in case we get weird values from above.
+		 * This should not happen, but ¯\_(ツ)_/¯
+		 */
+		if ( 0 >= $seconds_remaining || 86400 < $seconds_remaining ) {
+			$seconds_remaining = DAY_IN_SECONDS; // Default: a full day, i.e. 86400 seconds.
+		}
+
+		/**
+		 * Allow filtering the time the data is cached.
+		 *
+		 * @param int $seconds_remaining Number of seconds.
+		 */
+		return (int) apply_filters( 'jeherve_posts_on_this_day_cache_duration', $seconds_remaining );
 	}
 }
