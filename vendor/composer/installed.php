@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => 'e498e51bfb143f3eb0d884b1de50781c663cf6ea',
+    'reference' => '2d51c508c245989607f121587c04a376c7b7d9a7',
     'name' => 'jeherve/posts-on-this-day',
   ),
   'versions' => 
@@ -27,7 +27,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => 'e498e51bfb143f3eb0d884b1de50781c663cf6ea',
+      'reference' => '2d51c508c245989607f121587c04a376c7b7d9a7',
     ),
   ),
 );
