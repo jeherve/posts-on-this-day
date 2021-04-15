@@ -262,7 +262,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 			esc_html__( 'Are you only interested in posts that were published on that exact day?', 'posts-on-this-day' ),
 			esc_attr( $this->get_field_name( 'exact_match' ) ),
 			checked( $instance['exact_match'], 1, false ),
-			esc_html__( 'By default, the widget will look for posts that were published around that day (within a week) in years past.', 'jetpack' )
+			esc_html__( 'By default, the widget will look for posts that were published around that day (within a week) in years past.', 'posts-on-this-day' )
 		);
 	}
 } // Class Posts_On_This_Day_Widget
