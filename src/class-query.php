@@ -36,6 +36,9 @@ class Query {
 		/**
 		 * Filter the amount of years back to fetch posts from.
 		 *
+		 * Careful though; that can make for some really expensive queries,
+		 * so could slow the first loading of the page where the widget is displayed once a day.
+		 *
 		 * @since 1.2.0
 		 *
 		 * @param int $back Amount of years back to fetch posts from.
