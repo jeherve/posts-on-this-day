@@ -33,6 +33,15 @@ class Query {
 		$types       = implode( '-', $instance['post_types'] );
 		$exact_match = ! empty( $instance['exact_match'] ) ? (bool) $instance['exact_match'] : false;
 
+		/**
+		 * Filter the amount of years back to fetch posts from.
+		 *
+		 * @since 1.2.0
+		 *
+		 * @param int $back Amount of years back to fetch posts from.
+		 */
+		$back = apply_filters( 'jeherve_posts_on_this_day_query_back', $back );
+
 		/*
 		 * Let's attempt to cache data for a day
 		 * to avoid running an expensive WP_Query
