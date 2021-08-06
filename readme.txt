@@ -1,10 +1,10 @@
 === Posts On This Day ===
 Contributors: jeherve
 Tags: widget, on this day
-Stable tag: 1.5.2
+Stable tag: 1.5.3
 Requires at least: 5.6
 Requires PHP: 7.1
-Tested up to: 5.7
+Tested up to: 5.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,10 @@ You have 2 ways to do so.
 1. Widget settings
 
 == Changelog ==
+
+### [1.5.3] - 2021-08-06
+
+* Query: create new filter to allow setting a custom amount of years to fetch posts.
 
 ### [1.5.2] - 2021-04-15
 
