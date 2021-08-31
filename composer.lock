@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "05ee5d269a7fd3e050b41e414e2b6aaf",
+    "content-hash": "1c99a949b427c47f8592bb64db47ed3c",
     "packages": [
         {
             "name": "automattic/jetpack-autoloader",
-            "version": "v2.10.4",
+            "version": "v2.10.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Automattic/jetpack-autoloader.git",
-                "reference": "70cb300a7a215ae87c671f600f77093518f87bac"
+                "reference": "ec66177eefa1126d5319f3135ff3a7185e21a0ba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/70cb300a7a215ae87c671f600f77093518f87bac",
-                "reference": "70cb300a7a215ae87c671f600f77093518f87bac",
+                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/ec66177eefa1126d5319f3135ff3a7185e21a0ba",
+                "reference": "ec66177eefa1126d5319f3135ff3a7185e21a0ba",
                 "shasum": ""
             },
             "require": {
@@ -25,7 +25,7 @@
             },
             "require-dev": {
                 "automattic/jetpack-changelogger": "^1.2",
-                "yoast/phpunit-polyfills": "0.2.0"
+                "yoast/phpunit-polyfills": "1.0.1"
             },
             "type": "composer-plugin",
             "extra": {
@@ -53,9 +53,9 @@
             ],
             "description": "Creates a custom autoloader for a plugin or theme.",
             "support": {
-                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v2.10.4"
+                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v2.10.5"
             },
-            "time": "2021-08-10T06:44:08+00:00"
+            "time": "2021-08-31T17:20:29+00:00"
         }
     ],
     "packages-dev": [
