@@ -4,27 +4,27 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "486235efb54116b91632693549616481",
+    "content-hash": "e5d750a92bac0b7491c6025ff36e92f6",
     "packages": [
         {
             "name": "automattic/jetpack-autoloader",
-            "version": "v2.10.7",
+            "version": "v2.10.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Automattic/jetpack-autoloader.git",
-                "reference": "e3dfa1a2679e4b8e380bc37b722081875c84a381"
+                "reference": "95dfab9eaf9484887557ded269c44f9d03358290"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/e3dfa1a2679e4b8e380bc37b722081875c84a381",
-                "reference": "e3dfa1a2679e4b8e380bc37b722081875c84a381",
+                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/95dfab9eaf9484887557ded269c44f9d03358290",
+                "reference": "95dfab9eaf9484887557ded269c44f9d03358290",
                 "shasum": ""
             },
             "require": {
                 "composer-plugin-api": "^1.1 || ^2.0"
             },
             "require-dev": {
-                "automattic/jetpack-changelogger": "^2.0",
+                "automattic/jetpack-changelogger": "^3.0",
                 "yoast/phpunit-polyfills": "1.0.2"
             },
             "type": "composer-plugin",
@@ -53,9 +53,9 @@
             ],
             "description": "Creates a custom autoloader for a plugin or theme.",
             "support": {
-                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v2.10.7"
+                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v2.10.8"
             },
-            "time": "2021-10-07T14:29:51+00:00"
+            "time": "2021-10-13T17:10:50+00:00"
         }
     ],
     "packages-dev": [
