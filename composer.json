@@ -15,7 +15,9 @@
 		"automattic/jetpack-codesniffer": "2.6.0",
 		"dealerdirect/phpcodesniffer-composer-installer": "0.7.2",
 		"php-parallel-lint/php-parallel-lint": "1.3.2",
-		"yoast/phpunit-polyfills": "1.0.3"
+		"phpstan/phpstan": "^1.2",
+		"phpstan/extension-installer": "^1.1",
+		"szepeviktor/phpstan-wordpress": "^1.0"
 	},
 	"scripts": {
 		"php:lint": [
@@ -42,6 +44,11 @@
 		"test-php": [
 			"@composer phpunit"
 		],
+		"phpstan": [
+			"Composer\\Config::disableProcessTimeout",
+			"@composer update",
+			"./vendor/bin/phpstan analyze -c phpstan.neon.dist --memory-limit 128M"
+		],
 		"post-update-cmd": "php -r \"copy('vendor/automattic/wordbless/src/dbless-wpdb.php', 'wordpress/wp-content/db.php');\""
 	},
 	"autoload": {
@@ -55,7 +62,8 @@
 		"allow-plugins": {
 			"automattic/jetpack-autoloader": true,
 			"roots/wordpress-core-installer": true,
-			"dealerdirect/phpcodesniffer-composer-installer": true
+			"dealerdirect/phpcodesniffer-composer-installer": true,
+			"phpstan/extension-installer": true
 		}
 	}
 }
