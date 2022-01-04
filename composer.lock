@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "828e2d0e77941cafa6825c6e37a93698",
+    "content-hash": "3718fbf390bf9dd61fb1b4e7f69891f2",
     "packages": [
         {
             "name": "automattic/jetpack-autoloader",
-            "version": "v2.10.10",
+            "version": "v2.10.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Automattic/jetpack-autoloader.git",
-                "reference": "8060f5c5822671b146ce8f57380193c8fb8e2571"
+                "reference": "924226c0a9e2f9b0be022fc6bab2a90f5e610ef3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/8060f5c5822671b146ce8f57380193c8fb8e2571",
-                "reference": "8060f5c5822671b146ce8f57380193c8fb8e2571",
+                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/924226c0a9e2f9b0be022fc6bab2a90f5e610ef3",
+                "reference": "924226c0a9e2f9b0be022fc6bab2a90f5e610ef3",
                 "shasum": ""
             },
             "require": {
@@ -25,7 +25,7 @@
             },
             "require-dev": {
                 "automattic/jetpack-changelogger": "^3.0",
-                "yoast/phpunit-polyfills": "1.0.2"
+                "yoast/phpunit-polyfills": "1.0.3"
             },
             "type": "composer-plugin",
             "extra": {
@@ -53,9 +53,9 @@
             ],
             "description": "Creates a custom autoloader for a plugin or theme.",
             "support": {
-                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v2.10.10"
+                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v2.10.11"
             },
-            "time": "2021-11-16T16:27:09+00:00"
+            "time": "2022-01-04T21:11:27+00:00"
         }
     ],
     "packages-dev": [
@@ -3117,5 +3117,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.2.0"
 }
