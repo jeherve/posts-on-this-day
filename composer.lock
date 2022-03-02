@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0933193575c5a2138605ce008e313d71",
+    "content-hash": "349467f259fec921eadc85637962234a",
     "packages": [
         {
             "name": "automattic/jetpack-autoloader",
-            "version": "v2.10.12",
+            "version": "v2.10.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Automattic/jetpack-autoloader.git",
-                "reference": "4e406f3b747261f3848d7efa6faac45a296dacca"
+                "reference": "a4a7e59ff1471c4890c238379140f03a664a74f9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/4e406f3b747261f3848d7efa6faac45a296dacca",
-                "reference": "4e406f3b747261f3848d7efa6faac45a296dacca",
+                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/a4a7e59ff1471c4890c238379140f03a664a74f9",
+                "reference": "a4a7e59ff1471c4890c238379140f03a664a74f9",
                 "shasum": ""
             },
             "require": {
@@ -40,12 +40,12 @@
                 }
             },
             "autoload": {
-                "classmap": [
-                    "src/AutoloadGenerator.php"
-                ],
                 "psr-4": {
                     "Automattic\\Jetpack\\Autoloader\\": "src"
-                }
+                },
+                "classmap": [
+                    "src/AutoloadGenerator.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -53,9 +53,9 @@
             ],
             "description": "Creates a custom autoloader for a plugin or theme.",
             "support": {
-                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v2.10.12"
+                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v2.10.13"
             },
-            "time": "2022-01-25T17:38:25+00:00"
+            "time": "2022-03-01T20:37:25+00:00"
         }
     ],
     "packages-dev": [
