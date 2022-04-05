@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "641c27358f8c60fcae12266f574f993a",
+    "content-hash": "fcc0d8e20b8e65c4cd96827675e326b6",
     "packages": [
         {
             "name": "automattic/jetpack-autoloader",
@@ -61,19 +61,20 @@
     "packages-dev": [
         {
             "name": "automattic/jetpack-codesniffer",
-            "version": "v2.4.0",
+            "version": "v2.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Automattic/jetpack-codesniffer.git",
-                "reference": "3ed933e1851c0a409ff5d03d2ee575f3aa9d6120"
+                "reference": "b12fc6a893fbe63404cdc3780e75d780685b816a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Automattic/jetpack-codesniffer/zipball/3ed933e1851c0a409ff5d03d2ee575f3aa9d6120",
-                "reference": "3ed933e1851c0a409ff5d03d2ee575f3aa9d6120",
+                "url": "https://api.github.com/repos/Automattic/jetpack-codesniffer/zipball/b12fc6a893fbe63404cdc3780e75d780685b816a",
+                "reference": "b12fc6a893fbe63404cdc3780e75d780685b816a",
                 "shasum": ""
             },
             "require": {
+                "automattic/vipwpcs": "^2.3",
                 "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
                 "mediawiki/mediawiki-codesniffer": "^38.0",
                 "phpcompatibility/phpcompatibility-wp": "^2.1",
@@ -82,6 +83,7 @@
             },
             "require-dev": {
                 "automattic/jetpack-changelogger": "^3.0",
+                "wp-coding-standards/wpcs": "dev-develop#7b39722c38cbf2fe64c55be7154ee6f1807d304c as 2.3.1",
                 "yoast/phpunit-polyfills": "1.0.3"
             },
             "type": "phpcodesniffer-standard",
@@ -92,16 +94,16 @@
                     "link-template": "https://github.com/Automattic/jetpack-codesniffer/compare/v${old}...v${new}"
                 },
                 "branch-alias": {
-                    "dev-master": "2.4.x-dev"
+                    "dev-master": "2.5.x-dev"
                 }
             },
             "autoload": {
-                "classmap": [
-                    "hacks/"
-                ],
                 "psr-4": {
                     "Automattic\\Jetpack\\Sniffs\\": "Jetpack/Sniffs"
-                }
+                },
+                "classmap": [
+                    "hacks/"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -109,9 +111,61 @@
             ],
             "description": "Jetpack Coding Standards. Based on the WordPress Coding Standards, with some additions.",
             "support": {
-                "source": "https://github.com/Automattic/jetpack-codesniffer/tree/v2.4.0"
+                "source": "https://github.com/Automattic/jetpack-codesniffer/tree/v2.5.0"
             },
-            "time": "2022-02-01T16:34:59+00:00"
+            "time": "2022-04-05T18:48:16+00:00"
+        },
+        {
+            "name": "automattic/vipwpcs",
+            "version": "2.3.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Automattic/VIP-Coding-Standards.git",
+                "reference": "6cd0a6a82bc0ac988dbf9d6a7c2e293dc8ac640b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Automattic/VIP-Coding-Standards/zipball/6cd0a6a82bc0ac988dbf9d6a7c2e293dc8ac640b",
+                "reference": "6cd0a6a82bc0ac988dbf9d6a7c2e293dc8ac640b",
+                "shasum": ""
+            },
+            "require": {
+                "dealerdirect/phpcodesniffer-composer-installer": "^0.4.1 || ^0.5 || ^0.6.2 || ^0.7",
+                "php": ">=5.4",
+                "sirbrillig/phpcs-variable-analysis": "^2.11.1",
+                "squizlabs/php_codesniffer": "^3.5.5",
+                "wp-coding-standards/wpcs": "^2.3"
+            },
+            "require-dev": {
+                "php-parallel-lint/php-console-highlighter": "^0.5",
+                "php-parallel-lint/php-parallel-lint": "^1.0",
+                "phpcompatibility/php-compatibility": "^9",
+                "phpcsstandards/phpcsdevtools": "^1.0",
+                "phpunit/phpunit": "^4 || ^5 || ^6 || ^7"
+            },
+            "type": "phpcodesniffer-standard",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/Automattic/VIP-Coding-Standards/graphs/contributors"
+                }
+            ],
+            "description": "PHP_CodeSniffer rules (sniffs) to enforce WordPress VIP minimum coding conventions",
+            "keywords": [
+                "phpcs",
+                "standards",
+                "wordpress"
+            ],
+            "support": {
+                "issues": "https://github.com/Automattic/VIP-Coding-Standards/issues",
+                "source": "https://github.com/Automattic/VIP-Coding-Standards",
+                "wiki": "https://github.com/Automattic/VIP-Coding-Standards/wiki"
+            },
+            "time": "2021-09-29T16:20:23+00:00"
         },
         {
             "name": "automattic/wordbless",
@@ -159,23 +213,23 @@
         },
         {
             "name": "composer/semver",
-            "version": "3.2.7",
+            "version": "3.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/semver.git",
-                "reference": "deac27056b57e46faf136fae7b449eeaa71661ee"
+                "reference": "3953f23262f2bff1919fc82183ad9acb13ff62c9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/semver/zipball/deac27056b57e46faf136fae7b449eeaa71661ee",
-                "reference": "deac27056b57e46faf136fae7b449eeaa71661ee",
+                "url": "https://api.github.com/repos/composer/semver/zipball/3953f23262f2bff1919fc82183ad9acb13ff62c9",
+                "reference": "3953f23262f2bff1919fc82183ad9acb13ff62c9",
                 "shasum": ""
             },
             "require": {
                 "php": "^5.3.2 || ^7.0 || ^8.0"
             },
             "require-dev": {
-                "phpstan/phpstan": "^0.12.54",
+                "phpstan/phpstan": "^1.4",
                 "symfony/phpunit-bridge": "^4.2 || ^5"
             },
             "type": "library",
@@ -220,7 +274,7 @@
             "support": {
                 "irc": "irc://irc.freenode.org/composer",
                 "issues": "https://github.com/composer/semver/issues",
-                "source": "https://github.com/composer/semver/tree/3.2.7"
+                "source": "https://github.com/composer/semver/tree/3.3.2"
             },
             "funding": [
                 {
@@ -236,7 +290,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-01-04T09:57:54+00:00"
+            "time": "2022-04-01T19:23:25+00:00"
         },
         {
             "name": "composer/spdx-licenses",
@@ -2707,16 +2761,16 @@
         },
         {
             "name": "sirbrillig/phpcs-variable-analysis",
-            "version": "v2.11.2",
+            "version": "v2.11.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sirbrillig/phpcs-variable-analysis.git",
-                "reference": "3fad28475bfbdbf8aa5c440f8a8f89824983d85e"
+                "reference": "c921498b474212fe4552928bbeb68d70250ce5e8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sirbrillig/phpcs-variable-analysis/zipball/3fad28475bfbdbf8aa5c440f8a8f89824983d85e",
-                "reference": "3fad28475bfbdbf8aa5c440f8a8f89824983d85e",
+                "url": "https://api.github.com/repos/sirbrillig/phpcs-variable-analysis/zipball/c921498b474212fe4552928bbeb68d70250ce5e8",
+                "reference": "c921498b474212fe4552928bbeb68d70250ce5e8",
                 "shasum": ""
             },
             "require": {
@@ -2756,7 +2810,7 @@
                 "source": "https://github.com/sirbrillig/phpcs-variable-analysis",
                 "wiki": "https://github.com/sirbrillig/phpcs-variable-analysis/wiki"
             },
-            "time": "2021-07-06T23:45:17+00:00"
+            "time": "2022-02-21T17:01:13+00:00"
         },
         {
             "name": "squizlabs/php_codesniffer",
@@ -3123,5 +3177,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }
