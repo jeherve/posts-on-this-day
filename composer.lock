@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c88dc88e97d71725ce5bf4cb82757907",
+    "content-hash": "05cdd46a56ea90ae1750f2996f455e28",
     "packages": [
         {
             "name": "automattic/jetpack-autoloader",
-            "version": "v2.11.5",
+            "version": "v2.11.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Automattic/jetpack-autoloader.git",
-                "reference": "664c7cf0ff94b4f2f7c5b359bef3616822004a04"
+                "reference": "a22f41ff845b8bd4591a933b282270f57dd5bc1d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/664c7cf0ff94b4f2f7c5b359bef3616822004a04",
-                "reference": "664c7cf0ff94b4f2f7c5b359bef3616822004a04",
+                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/a22f41ff845b8bd4591a933b282270f57dd5bc1d",
+                "reference": "a22f41ff845b8bd4591a933b282270f57dd5bc1d",
                 "shasum": ""
             },
             "require": {
@@ -36,7 +36,7 @@
                     "link-template": "https://github.com/Automattic/jetpack-autoloader/compare/v${old}...v${new}"
                 },
                 "branch-alias": {
-                    "dev-master": "2.11.x-dev"
+                    "dev-trunk": "2.11.x-dev"
                 }
             },
             "autoload": {
@@ -53,9 +53,9 @@
             ],
             "description": "Creates a custom autoloader for a plugin or theme.",
             "support": {
-                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v2.11.5"
+                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v2.11.6"
             },
-            "time": "2022-05-18T11:11:44+00:00"
+            "time": "2022-06-21T07:32:07+00:00"
         }
     ],
     "packages-dev": [
