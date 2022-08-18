@@ -23,7 +23,7 @@
 	},
 	"homepage": "https://github.com/jeherve/test-actions#readme",
 	"devDependencies": {
-		"@vercel/ncc": "^0.34.0"
+		"@vercel/ncc": "0.34.0"
 	},
 	"dependencies": {
 		"@actions/core": "^1.9.0",
