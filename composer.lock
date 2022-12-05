@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8eb13bbb6dc7356c96fb1598c36752c3",
+    "content-hash": "e98d675f2e887edac02fd4ee03fee61b",
     "packages": [
         {
             "name": "automattic/jetpack-autoloader",
-            "version": "v2.11.7",
+            "version": "v2.11.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Automattic/jetpack-autoloader.git",
-                "reference": "65170ab358aa5a8efd9de96666a46b74dc74513d"
+                "reference": "c4c5e729bf797b67518936f28053ad9bd396562b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/65170ab358aa5a8efd9de96666a46b74dc74513d",
-                "reference": "65170ab358aa5a8efd9de96666a46b74dc74513d",
+                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/c4c5e729bf797b67518936f28053ad9bd396562b",
+                "reference": "c4c5e729bf797b67518936f28053ad9bd396562b",
                 "shasum": ""
             },
             "require": {
@@ -53,9 +53,9 @@
             ],
             "description": "Creates a custom autoloader for a plugin or theme.",
             "support": {
-                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v2.11.7"
+                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v2.11.11"
             },
-            "time": "2022-07-26T13:41:25+00:00"
+            "time": "2022-10-25T09:01:02+00:00"
         }
     ],
     "packages-dev": [
