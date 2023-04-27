@@ -1,7 +1,7 @@
 === Posts On This Day ===
 Contributors: jeherve
 Tags: widget, on this day
-Stable tag: 1.5.3
+Stable tag: 1.5.4
 Requires at least: 5.6
 Requires PHP: 7.1
 Tested up to: 6.2
@@ -45,6 +45,10 @@ You have 2 ways to do so.
 1. Widget settings
 
 == Changelog ==
+
+### [1.5.4] - 2023-04-27
+
+* Query: do not display private and password-protected posts in the widget.
 
 ### [1.5.3] - 2021-08-06
 
