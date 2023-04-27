@@ -117,6 +117,8 @@ class Query {
 			'post_type'      => $instance['post_types'],
 			'posts_per_page' => $instance['max'],
 			'date_query'     => $date_query,
+			'has_password'   => false,
+			'post_status'    => 'publish',
 		);
 
 		/**
