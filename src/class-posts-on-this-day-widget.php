@@ -94,7 +94,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 					printf(
 						'<%1$s class="posts_on_this_day__year">%2$s</%1$s>',
 						esc_attr( $year_heading ),
-						esc_html( $year ),
+						esc_html( $year )
 					);
 
 					foreach ( $ids as $id ) {
