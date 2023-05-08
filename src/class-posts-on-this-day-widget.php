@@ -80,7 +80,23 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 
 			foreach ( $posts as $year => $ids ) {
 				if ( $instance['group_by_year'] ) {
-					echo '<h4 class="posts_on_this_day__year">' . esc_html( $year ) . '</h4>';
+					/**
+					 * Filters the heading level for the year heading in the Posts On This Day widget.
+					 *
+					 * @since 1.5.5
+					 *
+					 * @param string $year_heading Heading level. Default to h4.
+					 */
+					$year_heading = apply_filters(
+						'jeherve_posts_on_this_day_widget_year_heading',
+						'h4'
+					);
+					printf(
+						'<%1$s class="posts_on_this_day__year">%2$s</%1$s>',
+						esc_attr( $year_heading ),
+						esc_html( $year ),
+					);
+
 					foreach ( $ids as $id ) {
 						echo $display->display_post( $id, $instance ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}
