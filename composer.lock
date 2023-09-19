@@ -4,27 +4,27 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c3534b448bd30bb8c7e004a1a4d730d5",
+    "content-hash": "2ec3fbd16f627ef88cff07de12438a3e",
     "packages": [
         {
             "name": "automattic/jetpack-autoloader",
-            "version": "v2.11.22",
+            "version": "v2.11.23",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Automattic/jetpack-autoloader.git",
-                "reference": "32cc6b4a30e5cb5be669b4c8bed7330202e9f0c1"
+                "reference": "4198bea356038fcf73fcb32df73b08818abbf8f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/32cc6b4a30e5cb5be669b4c8bed7330202e9f0c1",
-                "reference": "32cc6b4a30e5cb5be669b4c8bed7330202e9f0c1",
+                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/4198bea356038fcf73fcb32df73b08818abbf8f3",
+                "reference": "4198bea356038fcf73fcb32df73b08818abbf8f3",
                 "shasum": ""
             },
             "require": {
                 "composer-plugin-api": "^1.1 || ^2.0"
             },
             "require-dev": {
-                "automattic/jetpack-changelogger": "^3.3.8",
+                "automattic/jetpack-changelogger": "^3.3.9",
                 "yoast/phpunit-polyfills": "1.1.0"
             },
             "type": "composer-plugin",
@@ -61,9 +61,9 @@
                 "wordpress"
             ],
             "support": {
-                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v2.11.22"
+                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v2.11.23"
             },
-            "time": "2023-08-23T17:57:14+00:00"
+            "time": "2023-09-19T18:19:19+00:00"
         }
     ],
     "packages-dev": [
@@ -2829,5 +2829,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }
