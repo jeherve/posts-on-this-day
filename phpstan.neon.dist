@@ -1,0 +1,18 @@
+parameters:
+	level: 4
+	paths:
+		- src
+		- tests
+	ignoreErrors:
+		# Uses func_get_args():
+		- '#Function apply_filters invoked with [0-9] parameters, 2 required#'
+		# WP_Query's have_posts is problematic. https://github.com/szepeviktor/phpstan-wordpress/issues/42
+		-
+			message: '#While loop condition is always true#'
+			path: src/class-query.php
+			count: 1
+		# The above have_posts problem causes an issue with wp_reset_postdata() as well.
+		-
+			message: '#Unreachable statement - code above always terminates.#'
+			path: src/class-query.php
+			count: 1

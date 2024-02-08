@@ -54,6 +54,8 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 	 *
 	 * @param array $args     Widget arguments.
 	 * @param array $instance Saved widget options.
+	 *
+	 * @return void
 	 */
 	public function widget( $args, $instance ) {
 		echo $args['before_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -187,6 +189,8 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 	 * @see WP_Widget::form()
 	 *
 	 * @param array $instance Previously saved values from database.
+	 *
+	 * @return string|void
 	 */
 	public function form( $instance ) {
 		// Defaults.
