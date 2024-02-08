@@ -13,7 +13,7 @@
 	"require-dev": {
 		"automattic/wordbless": "dev-master",
 		"automattic/jetpack-codesniffer": "3.0.0",
-		"dealerdirect/phpcodesniffer-composer-installer": "1.0.0",
+		"dealerdirect/phpcodesniffer-composer-installer": "*",
 		"php-parallel-lint/php-parallel-lint": "1.3.2"
 	},
 	"scripts": {
