@@ -88,7 +88,7 @@ class Query {
 			// Add that year to the over date query args.
 			$date_query[] = $this_year_query;
 
-			$i++;
+			++$i;
 		}
 
 		// We are interested in posts for ANY of those dates.
