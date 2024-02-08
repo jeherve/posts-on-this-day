@@ -1,0 +1,18 @@
+name: "Issue Triage"
+description: "Automatically add labels on newly opened issues"
+inputs:
+  github_token:
+    description: "GitHub access token"
+    required: true
+    default: ${{ github.token }}
+  triage_projects_token:
+    description: "Triage Projects access token"
+    required: false
+    default: ""
+  triage_projects_board:
+    description: "Triage Projects board URL"
+    required: false
+    default: ""
+runs:
+  using: node16
+  main: "dist/index.js"

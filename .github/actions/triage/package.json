@@ -1,0 +1,35 @@
+{
+	"name": "triage",
+	"version": "1.0.0",
+	"description": "A GitHub action to automatically add labels on newly opened issues.",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "ncc build src/index.js -o dist --source-map"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/jeherve/test-actions.git"
+	},
+	"keywords": [
+		"github",
+		"action",
+		"octokit"
+	],
+	"author": "Jeremy Herve",
+	"license": "GPL-2.0-or-later",
+	"bugs": {
+		"url": "https://github.com/jeherve/test-actions/issues"
+	},
+	"homepage": "https://github.com/jeherve/test-actions#readme",
+	"devDependencies": {
+		"@vercel/ncc": "0.38.1"
+	},
+	"dependencies": {
+		"@actions/core": "1.10.1",
+		"@actions/github": "6.0.0"
+	},
+	"engines": {
+		"node": "20.11.0"
+	}
+}

@@ -88,7 +88,7 @@ class Query {
 			// Add that year to the over date query args.
 			$date_query[] = $this_year_query;
 
-			$i++;
+			++$i;
 		}
 
 		// We are interested in posts for ANY of those dates.
@@ -117,6 +117,8 @@ class Query {
 			'post_type'      => $instance['post_types'],
 			'posts_per_page' => $instance['max'],
 			'date_query'     => $date_query,
+			'has_password'   => false,
+			'post_status'    => 'publish',
 		);
 
 		/**
