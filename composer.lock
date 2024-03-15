@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b22bef82753433cb4b537b50c728fb49",
+    "content-hash": "4bf94406d33ee5fb55b8cca8225fc82a",
     "packages": [
         {
             "name": "automattic/jetpack-autoloader",
-            "version": "v3.0.2",
+            "version": "v3.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Automattic/jetpack-autoloader.git",
-                "reference": "bbf43988d1538a9f2678809b0868dc42111d0b12"
+                "reference": "11466fe7fce66d30281d7402940969e673f545f2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/bbf43988d1538a9f2678809b0868dc42111d0b12",
-                "reference": "bbf43988d1538a9f2678809b0868dc42111d0b12",
+                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/11466fe7fce66d30281d7402940969e673f545f2",
+                "reference": "11466fe7fce66d30281d7402940969e673f545f2",
                 "shasum": ""
             },
             "require": {
@@ -25,7 +25,7 @@
                 "php": ">=7.0"
             },
             "require-dev": {
-                "automattic/jetpack-changelogger": "^4.0.2",
+                "automattic/jetpack-changelogger": "^4.1.1",
                 "yoast/phpunit-polyfills": "1.1.0"
             },
             "type": "composer-plugin",
@@ -65,9 +65,9 @@
                 "wordpress"
             ],
             "support": {
-                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v3.0.2"
+                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v3.0.3"
             },
-            "time": "2023-11-21T18:59:10+00:00"
+            "time": "2024-03-14T20:43:03+00:00"
         }
     ],
     "packages-dev": [
