@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0673b0e6f5fd59970ea03e1173875073",
+    "content-hash": "cbbc5af8886bc08387b0b6f43e29259d",
     "packages": [
         {
             "name": "automattic/jetpack-autoloader",
-            "version": "v3.0.4",
+            "version": "v3.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Automattic/jetpack-autoloader.git",
-                "reference": "40c359a1cfdbca433a194197cb2627dad383d80d"
+                "reference": "7b2b988639cfeae5a3cdff3f877eac4b8b1358ab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/40c359a1cfdbca433a194197cb2627dad383d80d",
-                "reference": "40c359a1cfdbca433a194197cb2627dad383d80d",
+                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/7b2b988639cfeae5a3cdff3f877eac4b8b1358ab",
+                "reference": "7b2b988639cfeae5a3cdff3f877eac4b8b1358ab",
                 "shasum": ""
             },
             "require": {
@@ -25,7 +25,8 @@
                 "php": ">=7.0"
             },
             "require-dev": {
-                "automattic/jetpack-changelogger": "^4.1.2",
+                "automattic/jetpack-changelogger": "^4.2.0",
+                "composer/composer": "^1.1 || ^2.0",
                 "yoast/phpunit-polyfills": "1.1.0"
             },
             "type": "composer-plugin",
@@ -65,9 +66,9 @@
                 "wordpress"
             ],
             "support": {
-                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v3.0.4"
+                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v3.0.5"
             },
-            "time": "2024-03-18T17:10:51+00:00"
+            "time": "2024-04-11T12:21:00+00:00"
         }
     ],
     "packages-dev": [
