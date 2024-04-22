@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cbbc5af8886bc08387b0b6f43e29259d",
+    "content-hash": "7b99f1ba64621b8d91c5b32067aecea9",
     "packages": [
         {
             "name": "automattic/jetpack-autoloader",
-            "version": "v3.0.5",
+            "version": "v3.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Automattic/jetpack-autoloader.git",
-                "reference": "7b2b988639cfeae5a3cdff3f877eac4b8b1358ab"
+                "reference": "0b5758ce7481ba5e46fd9e4e8ad81d02a11b837e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/7b2b988639cfeae5a3cdff3f877eac4b8b1358ab",
-                "reference": "7b2b988639cfeae5a3cdff3f877eac4b8b1358ab",
+                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/0b5758ce7481ba5e46fd9e4e8ad81d02a11b837e",
+                "reference": "0b5758ce7481ba5e46fd9e4e8ad81d02a11b837e",
                 "shasum": ""
             },
             "require": {
@@ -25,7 +25,7 @@
                 "php": ">=7.0"
             },
             "require-dev": {
-                "automattic/jetpack-changelogger": "^4.2.0",
+                "automattic/jetpack-changelogger": "^4.2.2",
                 "composer/composer": "^1.1 || ^2.0",
                 "yoast/phpunit-polyfills": "1.1.0"
             },
@@ -66,9 +66,9 @@
                 "wordpress"
             ],
             "support": {
-                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v3.0.5"
+                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v3.0.6"
             },
-            "time": "2024-04-11T12:21:00+00:00"
+            "time": "2024-04-22T18:47:38+00:00"
         }
     ],
     "packages-dev": [
