@@ -1,6 +1,6 @@
 <?php
 /**
- * Posts on This Day widget class.
+ * Posts on This Day widget class. Testing things.
  *
  * @package jeherve/posts-on-this-day
  */
