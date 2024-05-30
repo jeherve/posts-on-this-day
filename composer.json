@@ -8,7 +8,7 @@
 		"issues": "https://github.com/jeherve/posts-on-this-day/issues"
 	},
 	"require": {
-		"automattic/jetpack-autoloader": "3.0.7"
+		"automattic/jetpack-autoloader": "3.0.8"
 	},
 	"require-dev": {
 		"automattic/wordbless": "dev-master",
