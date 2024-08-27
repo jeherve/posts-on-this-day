@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c8801203228c1f770057f89846027829",
+    "content-hash": "24375d3bdb0c2c18c428fb97145c6b0a",
     "packages": [
         {
             "name": "automattic/jetpack-autoloader",
-            "version": "v3.0.9",
+            "version": "v3.0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Automattic/jetpack-autoloader.git",
-                "reference": "a571038214fc3e142e10f38d1bb97e470fa7b0ec"
+                "reference": "ec4c465ce6a47fb15c15ab0224ec5b1272422d3e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/a571038214fc3e142e10f38d1bb97e470fa7b0ec",
-                "reference": "a571038214fc3e142e10f38d1bb97e470fa7b0ec",
+                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/ec4c465ce6a47fb15c15ab0224ec5b1272422d3e",
+                "reference": "ec4c465ce6a47fb15c15ab0224ec5b1272422d3e",
                 "shasum": ""
             },
             "require": {
@@ -25,9 +25,9 @@
                 "php": ">=7.0"
             },
             "require-dev": {
-                "automattic/jetpack-changelogger": "^4.2.5",
+                "automattic/jetpack-changelogger": "^4.2.6",
                 "composer/composer": "^1.1 || ^2.0",
-                "yoast/phpunit-polyfills": "1.1.0"
+                "yoast/phpunit-polyfills": "^1.1.1"
             },
             "type": "composer-plugin",
             "extra": {
@@ -66,9 +66,9 @@
                 "wordpress"
             ],
             "support": {
-                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v3.0.9"
+                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v3.0.10"
             },
-            "time": "2024-07-10T07:51:07+00:00"
+            "time": "2024-08-26T14:49:14+00:00"
         }
     ],
     "packages-dev": [
