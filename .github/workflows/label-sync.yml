@@ -30,13 +30,25 @@ jobs:
                 for ( const label of response.data ) {
                   if ( label.name.match( /\[Type\]|\[Feature\]|\[Feature Group\]/ ) ) {
                     core.debug( `Adding label to target repo: ${label.name}` );
-                    github.rest.issues.createLabel( {
-                      owner: targetRepo.split( '/' )[0],
-                      repo: targetRepo.split( '/' )[1],
-                      name: label.name,
-                      color: label.color,
-                      description: label.description,
-                    } );
+                    try {
+                      await github.rest.issues.createLabel( {
+                        owner: targetRepo.split( '/' )[0],
+                        repo: targetRepo.split( '/' )[1],
+                        name: label.name,
+                        color: label.color,
+                        description: label.description,
+                      } );
+                    } catch (error) {
+                      if ( error.status === 422 ) {
+                        core.debug( error.message );
+                        core.debug( `Label ${label.name} already exists in the target repo. Skipping...` );
+                      } else {
+                        core.debug( error.message );
+                      }
+                    }
+
+                    // sleep for 5 seconds to avoid rate limiting
+                    await new Promise( resolve => setTimeout( resolve, 5000 ) );
                   }
                 }
               }
