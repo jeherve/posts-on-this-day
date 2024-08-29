@@ -1,0 +1,46 @@
+name: Label Sync
+
+on:
+  workflow_dispatch:
+
+jobs:
+  label-sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Sync Labels
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+            const targetRepo = process.env.GITHUB_REPOSITORY;
+
+            async function syncLabels() {
+
+              core.debug( `Gather all labels to sync from the source repo.` );
+
+              for await ( const response of github.paginate.iterator( github.rest.issues.listLabelsForRepo, {
+                owner: 'automattic',
+                repo: 'wp-calypso',
+                per_page: 100,
+              } ) ) {
+                for ( const label of response.data ) {
+                  if ( label.name.match( /\[Type\]|\[Feature\]|\[Feature Group\]/ ) ) {
+                    core.debug( `Adding label to target repo: ${label.name}` );
+                    github.rest.issues.createLabel( {
+                      owner: targetRepo.split( '/' )[0],
+                      repo: targetRepo.split( '/' )[1],
+                      name: label.name,
+                      color: label.color,
+                      description: label.description,
+                    } );
+                  }
+                }
+              }
+            }
+
+            syncLabels();
