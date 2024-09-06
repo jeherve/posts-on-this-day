@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6414b891b3f15f67c5d59d6610bf40fa",
+    "content-hash": "dcb22c8729a7dd71193389fe0b8aa73c",
     "packages": [
         {
             "name": "automattic/jetpack-autoloader",
-            "version": "v3.0.10",
+            "version": "v3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Automattic/jetpack-autoloader.git",
-                "reference": "ec4c465ce6a47fb15c15ab0224ec5b1272422d3e"
+                "reference": "0e36d60ad64e35b5dab7fa4757fadb2235d58f73"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/ec4c465ce6a47fb15c15ab0224ec5b1272422d3e",
-                "reference": "ec4c465ce6a47fb15c15ab0224ec5b1272422d3e",
+                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/0e36d60ad64e35b5dab7fa4757fadb2235d58f73",
+                "reference": "0e36d60ad64e35b5dab7fa4757fadb2235d58f73",
                 "shasum": ""
             },
             "require": {
@@ -41,7 +41,7 @@
                     "::VERSION": "src/AutoloadGenerator.php"
                 },
                 "branch-alias": {
-                    "dev-trunk": "3.0.x-dev"
+                    "dev-trunk": "3.1.x-dev"
                 }
             },
             "autoload": {
@@ -66,9 +66,9 @@
                 "wordpress"
             ],
             "support": {
-                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v3.0.10"
+                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v3.1.0"
             },
-            "time": "2024-08-26T14:49:14+00:00"
+            "time": "2024-09-06T15:32:10+00:00"
         }
     ],
     "packages-dev": [
