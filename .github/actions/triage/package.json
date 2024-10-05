@@ -26,7 +26,7 @@
 		"@vercel/ncc": "0.38.2"
 	},
 	"dependencies": {
-		"@actions/core": "1.11.0",
+		"@actions/core": "1.11.1",
 		"@actions/github": "6.0.0"
 	},
 	"engines": {
