@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1a6051aff942a45ce546513afae6c0e6",
+    "content-hash": "b086a5e0bbb75c47cd3f143e29835466",
     "packages": [
         {
             "name": "automattic/jetpack-autoloader",
-            "version": "v3.1.1",
+            "version": "v3.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Automattic/jetpack-autoloader.git",
-                "reference": "a2d4d07c577354d1dcf5166c3db9a0d85aa58055"
+                "reference": "c111020cac7c6a830af6f6827c175e3c76a60f75"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/a2d4d07c577354d1dcf5166c3db9a0d85aa58055",
-                "reference": "a2d4d07c577354d1dcf5166c3db9a0d85aa58055",
+                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/c111020cac7c6a830af6f6827c175e3c76a60f75",
+                "reference": "c111020cac7c6a830af6f6827c175e3c76a60f75",
                 "shasum": ""
             },
             "require": {
@@ -66,9 +66,9 @@
                 "wordpress"
             ],
             "support": {
-                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v3.1.1"
+                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v3.1.2"
             },
-            "time": "2024-10-10T13:43:39+00:00"
+            "time": "2024-10-15T22:10:35+00:00"
         }
     ],
     "packages-dev": [
