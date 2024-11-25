@@ -4,29 +4,29 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "96c83b05ab5e8664f147fc36df7d1037",
+    "content-hash": "f569811b50560909cabc5c444e1e193f",
     "packages": [
         {
             "name": "automattic/jetpack-autoloader",
-            "version": "v4.0.0",
+            "version": "v5.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Automattic/jetpack-autoloader.git",
-                "reference": "40b9d16cbc3a37cea1a6873516e58270d7ff82c6"
+                "reference": "eb6331a5c50a03afd9896ce012e66858de9c49c5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/40b9d16cbc3a37cea1a6873516e58270d7ff82c6",
-                "reference": "40b9d16cbc3a37cea1a6873516e58270d7ff82c6",
+                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/eb6331a5c50a03afd9896ce012e66858de9c49c5",
+                "reference": "eb6331a5c50a03afd9896ce012e66858de9c49c5",
                 "shasum": ""
             },
             "require": {
-                "composer-plugin-api": "^1.1 || ^2.0",
+                "composer-plugin-api": "^2.2",
                 "php": ">=7.2"
             },
             "require-dev": {
-                "automattic/jetpack-changelogger": "^5.0.0",
-                "composer/composer": "^1.1 || ^2.0",
+                "automattic/jetpack-changelogger": "^5.1.0",
+                "composer/composer": "^2.2",
                 "yoast/phpunit-polyfills": "^1.1.1"
             },
             "type": "composer-plugin",
@@ -41,7 +41,7 @@
                     "::VERSION": "src/AutoloadGenerator.php"
                 },
                 "branch-alias": {
-                    "dev-trunk": "4.0.x-dev"
+                    "dev-trunk": "5.0.x-dev"
                 }
             },
             "autoload": {
@@ -66,9 +66,9 @@
                 "wordpress"
             ],
             "support": {
-                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v4.0.0"
+                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v5.0.0"
             },
-            "time": "2024-11-14T20:14:03+00:00"
+            "time": "2024-11-25T16:33:57+00:00"
         }
     ],
     "packages-dev": [
