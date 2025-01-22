@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3e9f6554e5846b5414b3d7dedb6e2213",
+    "content-hash": "7da55dfdbde8218edf345fa36e135061",
     "packages": [
         {
             "name": "automattic/jetpack-autoloader",
-            "version": "v5.0.0",
+            "version": "v5.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Automattic/jetpack-autoloader.git",
-                "reference": "eb6331a5c50a03afd9896ce012e66858de9c49c5"
+                "reference": "ba3f5146426367c718312a0da87ebd596ed9cf33"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/eb6331a5c50a03afd9896ce012e66858de9c49c5",
-                "reference": "eb6331a5c50a03afd9896ce012e66858de9c49c5",
+                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/ba3f5146426367c718312a0da87ebd596ed9cf33",
+                "reference": "ba3f5146426367c718312a0da87ebd596ed9cf33",
                 "shasum": ""
             },
             "require": {
@@ -31,17 +31,17 @@
             },
             "type": "composer-plugin",
             "extra": {
-                "autotagger": true,
                 "class": "Automattic\\Jetpack\\Autoloader\\CustomAutoloaderPlugin",
+                "autotagger": true,
                 "mirror-repo": "Automattic/jetpack-autoloader",
+                "branch-alias": {
+                    "dev-trunk": "5.0.x-dev"
+                },
                 "changelogger": {
                     "link-template": "https://github.com/Automattic/jetpack-autoloader/compare/v${old}...v${new}"
                 },
                 "version-constants": {
                     "::VERSION": "src/AutoloadGenerator.php"
-                },
-                "branch-alias": {
-                    "dev-trunk": "5.0.x-dev"
                 }
             },
             "autoload": {
@@ -66,9 +66,9 @@
                 "wordpress"
             ],
             "support": {
-                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v5.0.0"
+                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v5.0.1"
             },
-            "time": "2024-11-25T16:33:57+00:00"
+            "time": "2025-01-20T16:46:39+00:00"
         }
     ],
     "packages-dev": [
