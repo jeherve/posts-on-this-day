@@ -8,14 +8,13 @@
 		"issues": "https://github.com/jeherve/posts-on-this-day/issues"
 	},
 	"require": {
-		"automattic/jetpack-autoloader": "2.10.1"
+		"automattic/jetpack-autoloader": "5.0.1"
 	},
 	"require-dev": {
 		"automattic/wordbless": "dev-master",
-		"automattic/jetpack-codesniffer": "2.2.0",
-		"dealerdirect/phpcodesniffer-composer-installer": "0.7.1",
-		"php-parallel-lint/php-parallel-lint": "1.3.0",
-		"yoast/phpunit-polyfills": "0.2.0"
+		"automattic/jetpack-codesniffer": "5.0.0",
+		"dealerdirect/phpcodesniffer-composer-installer": "*",
+		"php-parallel-lint/php-parallel-lint": "1.4.0"
 	},
 	"scripts": {
 		"php:lint": [
@@ -50,5 +49,12 @@
 		]
 	},
 	"minimum-stability": "stable",
-	"prefer-stable": true
+	"prefer-stable": true,
+	"config": {
+		"allow-plugins": {
+			"automattic/jetpack-autoloader": true,
+			"roots/wordpress-core-installer": true,
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	}
 }

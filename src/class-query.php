@@ -33,6 +33,18 @@ class Query {
 		$types       = implode( '-', $instance['post_types'] );
 		$exact_match = ! empty( $instance['exact_match'] ) ? (bool) $instance['exact_match'] : false;
 
+		/**
+		 * Filter the amount of years back to fetch posts from.
+		 *
+		 * Careful though; that can make for some really expensive queries,
+		 * so could slow the first loading of the page where the widget is displayed once a day.
+		 *
+		 * @since 1.2.0
+		 *
+		 * @param int $back Amount of years back to fetch posts from.
+		 */
+		$back = apply_filters( 'jeherve_posts_on_this_day_query_back', $back );
+
 		/*
 		 * Let's attempt to cache data for a day
 		 * to avoid running an expensive WP_Query
@@ -76,7 +88,7 @@ class Query {
 			// Add that year to the over date query args.
 			$date_query[] = $this_year_query;
 
-			$i++;
+			++$i;
 		}
 
 		// We are interested in posts for ANY of those dates.
@@ -105,6 +117,8 @@ class Query {
 			'post_type'      => $instance['post_types'],
 			'posts_per_page' => $instance['max'],
 			'date_query'     => $date_query,
+			'has_password'   => false,
+			'post_status'    => 'publish',
 		);
 
 		/**
