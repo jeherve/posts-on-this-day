@@ -1,8 +1,9 @@
 name: Plugin asset/readme update
 on:
-  push:
-    branches:
-    - trunk
+# Only trigger when a release is published (and not a pre-release) in the GitHub repo.
+  release:
+    types: [published]
+
 jobs:
   trunk:
     name: Push to trunk
