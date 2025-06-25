@@ -1,4 +1,5 @@
 # Folders
+vendor/
 wordpress/
 .github/actions/triage/dist/
 .github/actions/triage/node_modules/
