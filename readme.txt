@@ -1,7 +1,7 @@
 === Posts On This Day ===
 Contributors: jeherve
 Tags: widget, on this day
-Stable tag: 1.5.5
+Stable tag: 1.5.6
 Requires at least: 5.6
 Requires PHP: 7.1
 Tested up to: 6.9
