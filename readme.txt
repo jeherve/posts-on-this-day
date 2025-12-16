@@ -35,10 +35,11 @@ Banner image: [@rirri01](https://unsplash.com/@rirri01)
 
 = I want to customize the look of my widget =
 
-You have 2 ways to do so.
+You have 3 ways to do so.
 
 1. You can add custom CSS to your site, targetting the `.posts_on_this_day` container and its contents to have the widget fit your needs.
 2. If you're comfortable with PHP, you can add a code snippet that hooks into the `jeherve_posts_on_this_day_post_markup` filter to customize the look of each single post in the widget. That's a good way to change the size of the images displayed for each post, for example.
+3. You can also use the `jeherve_posts_on_this_day_widget_before_posts` and `jeherve_posts_on_this_day_widget_after_posts` filters to add extra markup around the list of posts in the widget.
 
 == Screenshots ==
 
