@@ -65,8 +65,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 		);
 
 		// Display posts.
-		$posts   = ( new Query() )->get_posts( $instance );
-		$display = new Display();
+		$posts = ( new Query() )->get_posts( $instance );
 		if ( ! empty( $posts ) ) {
 			/** This filter is documented in core/src/wp-includes/default-widgets.php */
 			$title = apply_filters( 'widget_title', $instance['title'] );
@@ -96,15 +95,9 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 						esc_attr( $year_heading ),
 						esc_html( $year )
 					);
-
-					foreach ( $ids as $id ) {
-						echo $display->display_post( $id, $instance ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-					}
-				} else {
-					foreach ( $ids as $id ) {
-						echo $display->display_post( $id, $instance ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-					}
 				}
+
+				echo $this->display_posts( $ids, $instance ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 
 			// Close markup.
@@ -112,6 +105,53 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 		}
 
 		echo "\n" . $args['after_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
+
+	/**
+	 * Display the posts themselves.
+	 * Filterable so one can use to display the posts as a list, a grid, etc.
+	 *
+	 * @since 1.5.6
+	 *
+	 * @param array $post_ids Array of post IDs to display.
+	 * @param array $instance Saved widget options.
+	 *
+	 * @return string $output HTML output.
+	 */
+	public function display_posts( array $post_ids, array $instance ): string {
+		$display = new Display();
+
+		$output = '';
+
+		/**
+		 * Allow adding extra markup around the list of posts.
+		 * Can be used to display the posts as a list for example.
+		 *
+		 * @since 1.5.6
+		 *
+		 * @param string $output HTML output.
+		 * @param array  $post_ids Array of post IDs to display.
+		 * @param array  $instance Saved widget options.
+		 */
+		$output .= apply_filters( 'jeherve_posts_on_this_day_widget_before_posts', '', $post_ids, $instance );
+
+		foreach ( $post_ids as $post_id ) {
+			$output .= $display->display_post( $post_id, $this->instance );
+		}
+
+		/**
+		 * Allow adding extra markup around the list of posts.
+		 * Can be used to display the posts as a list for example.
+		 *
+		 * @since 1.5.6
+		 *
+		 * @param string $output HTML output.
+		 * @param array  $post_ids Array of post IDs to display.
+		 * @param array  $instance Saved widget options.
+		 */
+		$output .= apply_filters( 'jeherve_posts_on_this_day_widget_after_posts', '', $post_ids, $instance );
+
+		return $output;
 	}
 
 	/**

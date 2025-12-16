@@ -4,7 +4,7 @@ Tags: widget, on this day
 Stable tag: 1.5.5
 Requires at least: 5.6
 Requires PHP: 7.1
-Tested up to: 6.6
+Tested up to: 6.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,10 @@ You have 2 ways to do so.
 1. Widget settings
 
 == Changelog ==
+
+### [1.5.6] - 2025-12-16
+
+* Widget: add 2 new filters, `jeherve_posts_on_this_day_widget_before_posts` and `jeherve_posts_on_this_day_widget_after_posts`, allowing one to add extra markup around the list of posts in the widget.
 
 ### [1.5.5] - 2023-05-08
 
