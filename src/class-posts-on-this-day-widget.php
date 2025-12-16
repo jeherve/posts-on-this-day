@@ -136,7 +136,7 @@ class Posts_On_This_Day_Widget extends WP_Widget {
 		$output .= apply_filters( 'jeherve_posts_on_this_day_widget_before_posts', '', $post_ids, $instance );
 
 		foreach ( $post_ids as $post_id ) {
-			$output .= $display->display_post( $post_id, $this->instance );
+			$output .= $display->display_post( $post_id, $instance );
 		}
 
 		/**
