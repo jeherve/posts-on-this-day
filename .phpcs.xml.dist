@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <ruleset>
 	<config name="minimum_supported_wp_version" value="5.6" />
-	<config name="testVersion" value="7.1-"/>
+	<config name="testVersion" value="8.3-"/>
 
 	<!-- Default ruleset. -->
 	<rule ref="Jetpack" />
@@ -23,6 +23,17 @@
 			<property name="old_text_domain" type="array" />
 			<property name="new_text_domain" value="posts-on-this-day" />
 		</properties>
+	</rule>
+
+	<!-- Tests can use file names with uppercase letters. -->
+	<rule ref="WordPress.Files.FileName">
+		<exclude name="WordPress.Files.FileName.InvalidClassFileName" />
+		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase" />
+	</rule>
+
+	<!-- No need for backwards compatibility checks for PHPunit -->
+	<rule ref="Jetpack.PHPUnit.Attributes.AttributeFoundMissingAnnotation">
+		<exclude name="Jetpack.PHPUnit.Attributes.AttributeFoundMissingAnnotation" />
 	</rule>
 
 	<!-- Check all PHP files in directory tree by default. -->

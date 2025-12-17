@@ -3,7 +3,7 @@ Contributors: jeherve
 Tags: widget, on this day
 Stable tag: 1.5.6
 Requires at least: 5.6
-Requires PHP: 7.1
+Requires PHP: 8.3
 Tested up to: 6.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -46,6 +46,10 @@ You have 3 ways to do so.
 1. Widget settings
 
 == Changelog ==
+
+### Unreleased
+
+* General: the plugin now requires PHP 8.3.
 
 ### [1.5.6] - 2025-12-16
 

@@ -9,7 +9,7 @@
  * License: GPL2+
  * Text Domain: posts-on-this-day
  * Requires at least: 5.6
- * Requires PHP: 7.1
+ * Requires PHP: 8.3
  *
  * @package jeherve/posts-on-this-day
  */

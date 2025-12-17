@@ -8,13 +8,15 @@
 		"issues": "https://github.com/jeherve/posts-on-this-day/issues"
 	},
 	"require": {
+		"php": "^8.3",
 		"automattic/jetpack-autoloader": "5.0.1"
 	},
 	"require-dev": {
-		"automattic/wordbless": "^0.6.0",
+		"brain/monkey": "^2.6",
 		"automattic/jetpack-codesniffer": "7.0.0",
 		"dealerdirect/phpcodesniffer-composer-installer": "*",
-		"php-parallel-lint/php-parallel-lint": "1.4.0"
+		"php-parallel-lint/php-parallel-lint": "1.4.0",
+		"phpunit/phpunit": "^12.0"
 	},
 	"scripts": {
 		"php:lint": [
@@ -40,8 +42,7 @@
 		],
 		"test-php": [
 			"@composer phpunit"
-		],
-		"post-update-cmd": "php -r \"copy('vendor/automattic/wordbless/src/dbless-wpdb.php', 'wordpress/wp-content/db.php');\""
+		]
 	},
 	"autoload": {
 		"classmap": [

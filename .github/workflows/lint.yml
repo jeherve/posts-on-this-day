@@ -13,17 +13,15 @@ jobs:
   php_lint:
     name: PHP lint (${{ matrix.php-versions }})
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.experimental }}
     timeout-minutes: 3  # Successful runs seem to take ~1 minute
 
     strategy:
       fail-fast: false
       matrix:
-        php-versions: [ '8.1', '8.2' ]
-        experimental: [ false ]
+        php-versions: [ '8.3', '8.4' ]
 
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+      - uses: actions/checkout@v6
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -34,7 +32,8 @@ jobs:
       - name: Get Composer cache directory
         id: composer-cache
         run: |
-          echo "::set-output name=dir::$(composer config cache-files-dir)"
+          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
       - name: Use composer cache
         uses: actions/cache@v5
         with:
@@ -49,16 +48,9 @@ jobs:
           php --version
           which composer
           composer --version
-          which jq
-          jq --version
 
       - name: Install dependencies
-        run: |
-          # Install stuff ignoring platform reqs.
-          composer install --ignore-platform-reqs
-          # Remove stuff we don't need here that fails some platform reqs.
-          # This will complain if we missed any.
-          composer remove --dev automattic/jetpack-codesniffer
+        run: composer install
 
       - name: Run linter
         run: |
@@ -72,12 +64,12 @@ jobs:
     timeout-minutes: 5 # Successful runs seem to take ~1 minute. Let's stay on the safe side.
 
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+      - uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: 8.3
           tools: composer
           extensions: mysql, imagick
           coverage: none
@@ -85,7 +77,8 @@ jobs:
       - name: Get Composer cache directory
         id: composer-cache
         run: |
-          echo "::set-output name=dir::$(composer config cache-files-dir)"
+          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
       - name: Use composer cache
         uses: actions/cache@v5
         with:
@@ -100,8 +93,6 @@ jobs:
           php --version
           which composer
           composer --version
-          which jq
-          jq --version
 
       - name: Install dependencies
         run: composer install
@@ -118,12 +109,12 @@ jobs:
     timeout-minutes: 5 # Successful runs seem to take ~1 minute. Let's stay on the safe side.
 
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+      - uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: 8.3
           tools: composer
           extensions: mysql, imagick
           coverage: none
@@ -131,7 +122,8 @@ jobs:
       - name: Get Composer cache directory
         id: composer-cache
         run: |
-          echo "::set-output name=dir::$(composer config cache-files-dir)"
+          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
       - name: Use composer cache
         uses: actions/cache@v5
         with:
@@ -146,8 +138,6 @@ jobs:
           php --version
           which composer
           composer --version
-          which jq
-          jq --version
 
       - name: Install dependencies
         run: composer install
