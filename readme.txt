@@ -47,6 +47,10 @@ You have 3 ways to do so.
 
 == Changelog ==
 
+### Unreleased
+
+* General: the plugin now requires PHP 8.3.
+
 ### [1.5.6] - 2025-12-16
 
 * Widget: add 2 new filters, `jeherve_posts_on_this_day_widget_before_posts` and `jeherve_posts_on_this_day_widget_after_posts`, allowing one to add extra markup around the list of posts in the widget.
