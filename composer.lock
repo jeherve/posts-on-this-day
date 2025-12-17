@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "996c07b6995df7aed3f65b1a62291990",
+    "content-hash": "b98c8afb4c281f898031976dea2d8215",
     "packages": [
         {
             "name": "automattic/jetpack-autoloader",
-            "version": "v5.0.1",
+            "version": "v5.0.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Automattic/jetpack-autoloader.git",
-                "reference": "ba3f5146426367c718312a0da87ebd596ed9cf33"
+                "reference": "d5263d6ffa91dc0d0d39b1df54de1e9bb2091364"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/ba3f5146426367c718312a0da87ebd596ed9cf33",
-                "reference": "ba3f5146426367c718312a0da87ebd596ed9cf33",
+                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/d5263d6ffa91dc0d0d39b1df54de1e9bb2091364",
+                "reference": "d5263d6ffa91dc0d0d39b1df54de1e9bb2091364",
                 "shasum": ""
             },
             "require": {
@@ -25,9 +25,10 @@
                 "php": ">=7.2"
             },
             "require-dev": {
-                "automattic/jetpack-changelogger": "^5.1.0",
+                "automattic/jetpack-changelogger": "^6.0.12",
+                "automattic/phpunit-select-config": "^1.0.3",
                 "composer/composer": "^2.2",
-                "yoast/phpunit-polyfills": "^1.1.1"
+                "yoast/phpunit-polyfills": "^4.0.0"
             },
             "type": "composer-plugin",
             "extra": {
@@ -66,9 +67,9 @@
                 "wordpress"
             ],
             "support": {
-                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v5.0.1"
+                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v5.0.15"
             },
-            "time": "2025-01-20T16:46:39+00:00"
+            "time": "2025-12-15T11:22:11+00:00"
         }
     ],
     "packages-dev": [
