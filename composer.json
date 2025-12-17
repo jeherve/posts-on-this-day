@@ -9,7 +9,7 @@
 	},
 	"require": {
 		"php": "^8.3",
-		"automattic/jetpack-autoloader": "5.0.1"
+		"automattic/jetpack-autoloader": "5.0.15"
 	},
 	"require-dev": {
 		"brain/monkey": "^2.6",
