@@ -182,7 +182,7 @@ class Query {
 	/**
 	 * Get today's date in the site's timezone.
 	 *
-	 * @since 2.1.0
+	 * @since 1.5.7
 	 *
 	 * @return string Today's date in Y-m-d format.
 	 */
