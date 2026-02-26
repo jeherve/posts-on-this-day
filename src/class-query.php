@@ -51,11 +51,12 @@ class Query {
 		 * that we know will return the same result for a day.
 		 */
 		$transient_key = sprintf(
-			'jeherve_posts_on_this_day_%1$d_%2$d_%3$s_%4$s',
+			'jeherve_posts_on_this_day_%1$d_%2$d_%3$s_%4$s_%5$s',
 			$max,
 			$back,
 			esc_attr( $types ),
-			( true === $exact_match ? 'exact' : 'aweek' )
+			( true === $exact_match ? 'exact' : 'aweek' ),
+			self::get_today_date()
 		);
 
 		$cached_posts = get_transient( $transient_key );
@@ -66,7 +67,7 @@ class Query {
 		// Loop to create an array of date ranges where we want to search for posts.
 		$i = 1;
 		while ( $back >= $i ) {
-			$today         = new DateTime();
+			$today         = new DateTime( 'now', wp_timezone() );
 			$date_interval = sprintf( 'P%dY', $i );
 
 			// This is either a week before, or the same day if you've chosen exact matching.
@@ -155,11 +156,12 @@ class Query {
 	 * @return int $seconds Number of seconds left until midnight.
 	 */
 	public static function get_seconds_left_in_day(): int {
-		$time_tonight = (int) strtotime( 'today 24:00' );
-		$time_now     = (int) current_time( 'timestamp' ); // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested -- we specifically want the current timestamp.
+		$site_tz  = wp_timezone();
+		$now      = new DateTime( 'now', $site_tz );
+		$midnight = new DateTime( 'tomorrow midnight', $site_tz );
 
-		// Seconds left until midnight.
-		$seconds_remaining = $time_tonight - $time_now;
+		// Seconds left until midnight in the site's timezone.
+		$seconds_remaining = $midnight->getTimestamp() - $now->getTimestamp();
 
 		/*
 		 * Set a default fallback in case we get weird values from above.
@@ -175,5 +177,16 @@ class Query {
 		 * @param int $seconds_remaining Number of seconds.
 		 */
 		return (int) apply_filters( 'jeherve_posts_on_this_day_cache_duration', $seconds_remaining );
+	}
+
+	/**
+	 * Get today's date in the site's timezone.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return string Today's date in Y-m-d format.
+	 */
+	public static function get_today_date(): string {
+		return ( new DateTime( 'now', wp_timezone() ) )->format( 'Y-m-d' );
 	}
 }
