@@ -1,7 +1,7 @@
 === Posts On This Day ===
 Contributors: jeherve
 Tags: widget, on this day
-Stable tag: 1.5.6
+Stable tag: 1.5.7
 Requires at least: 5.6
 Requires PHP: 8.3
 Tested up to: 6.9
@@ -47,9 +47,11 @@ You have 3 ways to do so.
 
 == Changelog ==
 
-### Unreleased
+### [1.5.7] - 2026-02-27
 
 * General: the plugin now requires PHP 8.3.
+* Query: use the site's configured timezone instead of UTC when determining "today", fixing a bug where the widget could show yesterday's posts on sites with non-UTC timezones.
+* Caching: fix cache duration calculation to use consistent timezone-aware DateTime objects, and include the current date in the cache key for more reliable daily invalidation. Props @mrclicko.
 
 ### [1.5.6] - 2025-12-16
 
