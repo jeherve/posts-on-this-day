@@ -23,9 +23,34 @@ class Block {
 	 */
 	public function init(): void {
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_editor_assets' ) );
+		add_filter( 'render_block_data', array( $this, 'force_custom_query' ) );
 		add_filter( 'query_loop_block_query_vars', array( $this, 'filter_query_vars' ), 10, 2 );
 		add_filter( 'rest_post_query', array( $this, 'filter_rest_query' ), 10, 2 );
 		add_filter( 'render_block_core/post-template', array( $this, 'maybe_inject_year_headings' ), 10, 3 );
+	}
+
+	/**
+	 * Force our variation to use a custom query instead of inheriting the global one.
+	 *
+	 * The core/query block defaults inherit to true, which makes the post-template
+	 * use the global WP_Query (e.g. the page's own query on singular views).
+	 * We override this so our date-based query always runs.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param array $parsed_block The parsed block data.
+	 *
+	 * @return array The modified parsed block data.
+	 */
+	public function force_custom_query( array $parsed_block ): array {
+		if (
+			isset( $parsed_block['attrs']['namespace'] )
+			&& 'jeherve/posts-on-this-day' === $parsed_block['attrs']['namespace']
+		) {
+			$parsed_block['attrs']['query']['inherit'] = false;
+		}
+
+		return $parsed_block;
 	}
 
 	/**

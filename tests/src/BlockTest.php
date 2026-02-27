@@ -45,6 +45,9 @@ class BlockTest extends TestCase {
 			has_action( 'enqueue_block_editor_assets', array( $instance, 'enqueue_editor_assets' ) ) !== false
 		);
 		$this->assertTrue(
+			has_filter( 'render_block_data', array( $instance, 'force_custom_query' ) ) !== false
+		);
+		$this->assertTrue(
 			has_filter( 'query_loop_block_query_vars', array( $instance, 'filter_query_vars' ) ) !== false
 		);
 		$this->assertTrue(
@@ -53,6 +56,44 @@ class BlockTest extends TestCase {
 		$this->assertTrue(
 			has_filter( 'render_block_core/post-template', array( $instance, 'maybe_inject_year_headings' ) ) !== false
 		);
+	}
+
+	/**
+	 * Test that force_custom_query sets inherit to false for our variation.
+	 */
+	public function test_force_custom_query_sets_inherit_false(): void {
+		$instance     = new Block();
+		$parsed_block = array(
+			'attrs' => array(
+				'namespace' => 'jeherve/posts-on-this-day',
+				'query'     => array(
+					'inherit' => true,
+				),
+			),
+		);
+
+		$result = $instance->force_custom_query( $parsed_block );
+
+		$this->assertFalse( $result['attrs']['query']['inherit'] );
+	}
+
+	/**
+	 * Test that force_custom_query does not modify other blocks.
+	 */
+	public function test_force_custom_query_skips_other_blocks(): void {
+		$instance     = new Block();
+		$parsed_block = array(
+			'attrs' => array(
+				'namespace' => 'core/query',
+				'query'     => array(
+					'inherit' => true,
+				),
+			),
+		);
+
+		$result = $instance->force_custom_query( $parsed_block );
+
+		$this->assertTrue( $result['attrs']['query']['inherit'] );
 	}
 
 	/**
