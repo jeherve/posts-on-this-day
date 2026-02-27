@@ -49,12 +49,8 @@ You have 3 ways to do so.
 
 ### [2.0.0] - 2026-02-27
 
-* New: Add a block editor block as a Query Loop block variation.
-* New: Custom inspector controls for years back, exact match, group by year, and year heading level.
-* New: Server-side query filtering to display posts from this day in previous years.
-* New: Year heading injection to group posts by year on the front end.
-* New: REST API filtering for editor preview support.
-* Changed: Bump required WordPress version to 6.8.
+* New: "Posts On This Day" is now available as a block for use in the block editor and block-based themes.
+* Changed: The plugin now requires WordPress 6.8 or later.
 
 ### [1.5.7] - 2026-02-27
 
