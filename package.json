@@ -1,0 +1,23 @@
+{
+	"name": "posts-on-this-day",
+	"version": "2.0.0",
+	"description": "Display a list of posts published on this day in years past.",
+	"private": true,
+	"license": "GPL-2.0-or-later",
+	"scripts": {
+		"build": "wp-scripts build src/block/index.js --output-path=build",
+		"start": "wp-scripts start src/block/index.js --output-path=build",
+		"lint:js": "wp-scripts lint-js src/block/",
+		"format": "wp-scripts format src/block/"
+	},
+	"devDependencies": {
+		"@wordpress/scripts": "31.5.0"
+	},
+	"dependencies": {
+		"@wordpress/block-editor": "15.13.1",
+		"@wordpress/blocks": "15.13.0",
+		"@wordpress/components": "32.2.0",
+		"@wordpress/hooks": "4.40.0",
+		"@wordpress/i18n": "6.13.0"
+	}
+}
