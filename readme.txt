@@ -1,8 +1,8 @@
 === Posts On This Day ===
 Contributors: jeherve
 Tags: widget, on this day
-Stable tag: 1.5.7
-Requires at least: 5.6
+Stable tag: 2.0.0
+Requires at least: 6.8
 Requires PHP: 8.3
 Tested up to: 6.9
 License: GPLv2 or later
@@ -46,6 +46,15 @@ You have 3 ways to do so.
 1. Widget settings
 
 == Changelog ==
+
+### [2.0.0] - 2026-02-27
+
+* New: Add a block editor block as a Query Loop block variation.
+* New: Custom inspector controls for years back, exact match, group by year, and year heading level.
+* New: Server-side query filtering to display posts from this day in previous years.
+* New: Year heading injection to group posts by year on the front end.
+* New: REST API filtering for editor preview support.
+* Changed: Bump required WordPress version to 6.8.
 
 ### [1.5.7] - 2026-02-27
 
