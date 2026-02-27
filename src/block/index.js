@@ -45,7 +45,7 @@ registerBlockVariation( 'core/query', {
 			yearHeadingLevel: 3,
 		},
 	},
-	allowedControls: [ 'order', 'postType' ],
+	allowedControls: [ 'order' ],
 	innerBlocks: [
 		[
 			'core/post-template',
