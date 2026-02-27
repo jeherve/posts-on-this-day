@@ -52,7 +52,7 @@ registerBlockVariation( 'core/query', {
 			{},
 			[
 				[ 'core/post-featured-image' ],
-				[ 'core/post-title' ],
+				[ 'core/post-title', { isLink: true } ],
 				[ 'core/post-date' ],
 			],
 		],
