@@ -25,8 +25,7 @@ class Query {
 	 * @return array $posts Array of post IDs.
 	 */
 	public function get_posts( array $instance ): array {
-		$posts      = array();
-		$date_query = array();
+		$posts = array();
 
 		$max         = ! empty( $instance['max'] ) ? (int) $instance['max'] : 10; // How many posts do we want maximum?
 		$back        = ! empty( $instance['back'] ) ? (int) $instance['back'] : 10; // How many years back to we want to go back?
@@ -64,9 +63,33 @@ class Query {
 			return $cached_posts;
 		}
 
+		// Build the date query using the shared static method.
+		$date_query = self::build_date_query( $back, $exact_match );
+
+		// Make our query for posts.
+		$posts = $this->query_posts( $date_query, $instance );
+
+		set_transient( $transient_key, $posts, self::get_seconds_left_in_day() );
+
+		return $posts;
+	}
+
+	/**
+	 * Build a date query array for fetching posts "on this day" in previous years.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param int  $years_back  How many years back to search.
+	 * @param bool $exact_match Whether to match the exact day (true) or within a week (false).
+	 *
+	 * @return array Date query array suitable for WP_Query's date_query parameter.
+	 */
+	public static function build_date_query( int $years_back, bool $exact_match ): array {
+		$date_query = array();
+
 		// Loop to create an array of date ranges where we want to search for posts.
 		$i = 1;
-		while ( $back >= $i ) {
+		while ( $years_back >= $i ) {
 			$today         = new DateTime( 'now', wp_timezone() );
 			$date_interval = sprintf( 'P%dY', $i );
 
@@ -86,7 +109,7 @@ class Query {
 				$this_year_query['inclusive'] = true;
 			}
 
-			// Add that year to the over date query args.
+			// Add that year to the overall date query args.
 			$date_query[] = $this_year_query;
 
 			++$i;
@@ -95,12 +118,7 @@ class Query {
 		// We are interested in posts for ANY of those dates.
 		$date_query['relation'] = 'OR';
 
-		// Make our query for posts.
-		$posts = $this->query_posts( $date_query, $instance );
-
-		set_transient( $transient_key, $posts, self::get_seconds_left_in_day() );
-
-		return $posts;
+		return $date_query;
 	}
 
 	/**
