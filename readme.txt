@@ -1,20 +1,20 @@
 === Posts On This Day ===
 Contributors: jeherve
-Tags: widget, on this day
-Stable tag: 1.5.7
-Requires at least: 5.6
+Tags: widget, block, on this day
+Stable tag: 2.0.0
+Requires at least: 6.8
 Requires PHP: 8.3
 Tested up to: 6.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Widget to display a list of posts published "on this day" in years past. A good little bit of nostalgia for your blog.
+Display a list of posts published "on this day" in years past. A good little bit of nostalgia for your blog.
 
 == Description ==
 
-If you're familiar with services like Google Photos, TimeHop, or even Facebook Memories, you most likely enjoyed getting little reminders of what happened in your life in years past. This little widget brings this feature to your site.
+If you're familiar with services like Google Photos, TimeHop, or even Facebook Memories, you most likely enjoyed getting little reminders of what happened in your life in years past. This plugin brings this feature to your site.
 
-This widget, just like Google Photos does, will give you a list of posts that were published at around this time (within a week) in the past years. You can choose:
+Just like Google Photos does, it will give you a list of posts that were published at around this time (within a week) in the past years. It is available as a block for the block editor and block-based themes, as well as a legacy widget. You can choose:
 
 * how many years back it should go.
 * how many posts should be displayed at maximum.
@@ -29,7 +29,8 @@ Banner image: [@rirri01](https://unsplash.com/@rirri01)
 == Installation ==
 
 * The usual. Go to Plugins > Add New, search, and install.
-* You can then go to Appearance > Widgets or Appearance > Customize to set up your widget in one of your widget areas.
+* **Block editor**: Add the "Posts On This Day" block to any page or template. You'll find it in the block inserter.
+* **Legacy widget**: Go to Appearance > Widgets or Appearance > Customize to set up the widget in one of your widget areas.
 
 == FAQ ==
 
@@ -46,6 +47,11 @@ You have 3 ways to do so.
 1. Widget settings
 
 == Changelog ==
+
+### [2.0.0] - 2026-02-27
+
+* New: "Posts On This Day" is now available as a block for use in the block editor and block-based themes.
+* Changed: The plugin now requires WordPress 6.8 or later.
 
 ### [1.5.7] - 2026-02-27
 

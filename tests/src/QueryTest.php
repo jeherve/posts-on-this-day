@@ -107,4 +107,65 @@ class QueryTest extends TestCase {
 
 		$this->assertSame( $expected, $result );
 	}
+
+	/**
+	 * Test the structure of build_date_query with default (non-exact) matching.
+	 */
+	public function test_build_date_query_structure(): void {
+		Functions\when( 'wp_timezone' )->justReturn( new DateTimeZone( 'UTC' ) );
+
+		$result = Query::build_date_query( 3, false );
+
+		// Should have 3 date ranges + relation key.
+		$this->assertCount( 4, $result ); // 3 ranges + 'relation'
+		$this->assertSame( 'OR', $result['relation'] );
+
+		// Each range should have 'before' and 'after' keys.
+		for ( $i = 0; $i < 3; $i++ ) {
+			$this->assertArrayHasKey( 'before', $result[ $i ] );
+			$this->assertArrayHasKey( 'after', $result[ $i ] );
+			// Date format should be Y-m-d.
+			$this->assertMatchesRegularExpression( '/^\d{4}-\d{2}-\d{2}$/', $result[ $i ]['before'] );
+			$this->assertMatchesRegularExpression( '/^\d{4}-\d{2}-\d{2}$/', $result[ $i ]['after'] );
+		}
+	}
+
+	/**
+	 * Test build_date_query with exact matching.
+	 */
+	public function test_build_date_query_exact_match(): void {
+		Functions\when( 'wp_timezone' )->justReturn( new DateTimeZone( 'UTC' ) );
+
+		$result = Query::build_date_query( 2, true );
+
+		// Should have 2 date ranges + relation key.
+		$this->assertCount( 3, $result ); // 2 ranges + 'relation'
+		$this->assertSame( 'OR', $result['relation'] );
+
+		// Each range should be inclusive.
+		for ( $i = 0; $i < 2; $i++ ) {
+			$this->assertArrayHasKey( 'inclusive', $result[ $i ] );
+			$this->assertTrue( $result[ $i ]['inclusive'] );
+			// Before and after should be the same date (exact match).
+			$this->assertSame( $result[ $i ]['before'], $result[ $i ]['after'] );
+		}
+	}
+
+	/**
+	 * Test build_date_query non-exact ranges span approximately 7 days.
+	 */
+	public function test_build_date_query_non_exact_spans_week(): void {
+		Functions\when( 'wp_timezone' )->justReturn( new DateTimeZone( 'UTC' ) );
+
+		$result = Query::build_date_query( 1, false );
+
+		$before = new \DateTime( $result[0]['before'] );
+		$after  = new \DateTime( $result[0]['after'] );
+		$diff   = $before->diff( $after )->days;
+
+		// The span should be 7 days.
+		$this->assertSame( 7, $diff );
+		// Should NOT have inclusive key.
+		$this->assertArrayNotHasKey( 'inclusive', $result[0] );
+	}
 }

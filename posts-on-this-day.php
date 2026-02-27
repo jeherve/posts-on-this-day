@@ -2,13 +2,13 @@
 /**
  * Plugin Name: Posts On This Day
  * Plugin URI: https://jeremy.hu/my-plugins/posts-on-this-day/
- * Description: Widget to display a list of posts published "on this day" in years past. A good little bit of nostalgia for your blog.
+ * Description: Display a list of posts published "on this day" in years past. A good little bit of nostalgia for your blog.
  * Author: Jeremy Herve
- * Version: 1.5.7
+ * Version: 2.0.0
  * Author URI: https://jeremy.hu
  * License: GPL2+
  * Text Domain: posts-on-this-day
- * Requires at least: 5.6
+ * Requires at least: 6.8
  * Requires PHP: 8.3
  *
  * @package jeherve/posts-on-this-day
@@ -30,3 +30,6 @@ add_action(
 		register_widget( __NAMESPACE__ . '\Posts_On_This_Day_Widget' );
 	}
 );
+
+// Register block variation.
+( new Block() )->init();

@@ -1,4 +1,11 @@
 {
 	"extends": ["config:base"],
-	"labels": ["[Type] Janitorial", "Deps"]
+	"labels": ["[Type] Janitorial", "Deps"],
+	"packageRules": [
+		{
+			"matchPackagePatterns": ["^@wordpress/"],
+			"groupName": "WordPress packages",
+			"groupSlug": "wordpress-packages"
+		}
+	]
 }

@@ -48,7 +48,8 @@
 	<!-- Ignore git, in case someone created a branch ending in ".php" or something -->
 	<exclude-pattern>/.git/*</exclude-pattern>
 
-	<!-- Ignore external libraries -->
+	<!-- Ignore external libraries and build artifacts -->
+	<exclude-pattern>/build/*</exclude-pattern>
 	<exclude-pattern>/node_modules/*</exclude-pattern>
 	<exclude-pattern>/vendor/*</exclude-pattern>
 	<exclude-pattern>/wordpress/*</exclude-pattern>
