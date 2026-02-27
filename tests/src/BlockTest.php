@@ -45,7 +45,7 @@ class BlockTest extends TestCase {
 			has_action( 'enqueue_block_editor_assets', array( $instance, 'enqueue_editor_assets' ) ) !== false
 		);
 		$this->assertTrue(
-			has_filter( 'pre_render_block', array( $instance, 'maybe_add_query_filter' ) ) !== false
+			has_filter( 'query_loop_block_query_vars', array( $instance, 'filter_query_vars' ) ) !== false
 		);
 		$this->assertTrue(
 			has_filter( 'rest_post_query', array( $instance, 'filter_rest_query' ) ) !== false
@@ -53,87 +53,6 @@ class BlockTest extends TestCase {
 		$this->assertTrue(
 			has_filter( 'render_block_core/post-template', array( $instance, 'maybe_inject_year_headings' ) ) !== false
 		);
-	}
-
-	/**
-	 * Test that maybe_add_query_filter adds filter when namespace matches.
-	 */
-	public function test_maybe_add_query_filter_adds_filter_when_namespace_matches(): void {
-		$instance     = new Block();
-		$parsed_block = array(
-			'attrs' => array(
-				'namespace' => 'jeherve/posts-on-this-day',
-			),
-		);
-
-		$instance->maybe_add_query_filter( null, $parsed_block );
-
-		$this->assertTrue(
-			has_filter( 'query_loop_block_query_vars', array( $instance, 'filter_query_vars' ) ) !== false
-		);
-	}
-
-	/**
-	 * Test that maybe_add_query_filter does not add filter when namespace does not match.
-	 */
-	public function test_maybe_add_query_filter_skips_when_namespace_does_not_match(): void {
-		$instance     = new Block();
-		$parsed_block = array(
-			'attrs' => array(
-				'namespace' => 'core/query',
-			),
-		);
-
-		$instance->maybe_add_query_filter( null, $parsed_block );
-
-		$this->assertFalse(
-			has_filter( 'query_loop_block_query_vars', array( $instance, 'filter_query_vars' ) )
-		);
-	}
-
-	/**
-	 * Test that maybe_add_query_filter only adds the filter once (idempotency).
-	 */
-	public function test_maybe_add_query_filter_is_idempotent(): void {
-		$instance     = new Block();
-		$parsed_block = array(
-			'attrs' => array(
-				'namespace' => 'jeherve/posts-on-this-day',
-			),
-		);
-
-		$instance->maybe_add_query_filter( null, $parsed_block );
-
-		// Remove the filter to check if calling again re-adds it.
-		remove_filter( 'query_loop_block_query_vars', array( $instance, 'filter_query_vars' ), 10 );
-
-		// Call again — should not re-add because query_filter_added is already true.
-		$instance->maybe_add_query_filter( null, $parsed_block );
-
-		$this->assertFalse(
-			has_filter( 'query_loop_block_query_vars', array( $instance, 'filter_query_vars' ) )
-		);
-	}
-
-	/**
-	 * Test that maybe_add_query_filter returns the pre_render value unchanged.
-	 */
-	public function test_maybe_add_query_filter_returns_pre_render_unchanged(): void {
-		$instance     = new Block();
-		$parsed_block = array(
-			'attrs' => array(
-				'namespace' => 'jeherve/posts-on-this-day',
-			),
-		);
-
-		// Test with null pre_render.
-		$result = $instance->maybe_add_query_filter( null, $parsed_block );
-		$this->assertNull( $result );
-
-		// Test with a string pre_render (new Block instance to reset state).
-		$instance_2 = new Block();
-		$result     = $instance_2->maybe_add_query_filter( '<div>pre-rendered</div>', $parsed_block );
-		$this->assertSame( '<div>pre-rendered</div>', $result );
 	}
 
 	/**

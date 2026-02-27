@@ -17,20 +17,13 @@ use WP_Block;
  */
 class Block {
 	/**
-	 * Whether the query_loop_block_query_vars filter has already been added.
-	 *
-	 * @var bool
-	 */
-	private $query_filter_added = false;
-
-	/**
 	 * Initialize hooks.
 	 *
 	 * @since 2.0.0
 	 */
 	public function init(): void {
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_editor_assets' ) );
-		add_filter( 'pre_render_block', array( $this, 'maybe_add_query_filter' ), 10, 2 );
+		add_filter( 'query_loop_block_query_vars', array( $this, 'filter_query_vars' ), 10, 2 );
 		add_filter( 'rest_post_query', array( $this, 'filter_rest_query' ), 10, 2 );
 		add_filter( 'render_block_core/post-template', array( $this, 'maybe_inject_year_headings' ), 10, 3 );
 	}
@@ -61,37 +54,6 @@ class Block {
 			'posts-on-this-day-editor',
 			'posts-on-this-day'
 		);
-	}
-
-	/**
-	 * Conditionally add the query_loop_block_query_vars filter
-	 * when a Posts On This Day block variation is being rendered.
-	 *
-	 * Hooked to pre_render_block to inspect the parsed block before rendering.
-	 *
-	 * @since 2.0.0
-	 *
-	 * @param string|null $pre_render  The pre-rendered content. Default null.
-	 * @param array       $parsed_block The block being rendered.
-	 *
-	 * @return string|null The unmodified pre-render value.
-	 */
-	public function maybe_add_query_filter( $pre_render, array $parsed_block ) {
-		if (
-			! $this->query_filter_added
-			&& isset( $parsed_block['attrs']['namespace'] )
-			&& 'jeherve/posts-on-this-day' === $parsed_block['attrs']['namespace']
-		) {
-			add_filter(
-				'query_loop_block_query_vars',
-				array( $this, 'filter_query_vars' ),
-				10,
-				2
-			);
-			$this->query_filter_added = true;
-		}
-
-		return $pre_render;
 	}
 
 	/**
@@ -174,8 +136,17 @@ class Block {
 		$heading_level = max( 2, min( 6, $heading_level ) );
 
 		// Re-build the query to determine post years in display order.
-		$page        = absint( $block->context['page'] ?? 1 );
-		$query_args  = build_query_vars_from_query_block( $block, $page );
+		$page       = absint( $block->context['page'] ?? 1 );
+		$query_args = build_query_vars_from_query_block( $block, $page );
+
+		// build_query_vars_from_query_block only extracts core's known properties,
+		// so we need to add our date filter manually for the re-query.
+		$years_back  = (int) ( $query_context['yearsBack'] ?? 10 );
+		$exact_match = (bool) ( $query_context['exactMatch'] ?? false );
+
+		$query_args['date_query']   = Query::build_date_query( $years_back, $exact_match );
+		$query_args['has_password'] = false;
+
 		$posts_query = new \WP_Query( $query_args );
 
 		if ( ! $posts_query->have_posts() ) {
