@@ -16,7 +16,10 @@
 		"automattic/jetpack-codesniffer": "7.0.0",
 		"dealerdirect/phpcodesniffer-composer-installer": "*",
 		"php-parallel-lint/php-parallel-lint": "1.4.0",
-		"phpunit/phpunit": "^12.0"
+		"phpunit/phpunit": "^12.0",
+		"phpstan/phpstan": "2.1.33",
+		"phpstan/extension-installer": "1.4.3",
+		"szepeviktor/phpstan-wordpress": "2.0.3"
 	},
 	"scripts": {
 		"php:lint": [
@@ -42,6 +45,11 @@
 		],
 		"test-php": [
 			"@composer phpunit"
+		],
+		"phpstan": [
+			"Composer\\Config::disableProcessTimeout",
+			"@composer update",
+			"./vendor/bin/phpstan analyze -c phpstan.neon.dist --memory-limit 128M"
 		]
 	},
 	"autoload": {
@@ -55,7 +63,8 @@
 		"allow-plugins": {
 			"automattic/jetpack-autoloader": true,
 			"roots/wordpress-core-installer": true,
-			"dealerdirect/phpcodesniffer-composer-installer": true
+			"dealerdirect/phpcodesniffer-composer-installer": true,
+			"phpstan/extension-installer": true
 		}
 	}
 }
