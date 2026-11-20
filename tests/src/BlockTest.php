@@ -54,6 +54,12 @@ class BlockTest extends TestCase {
 			has_action( 'rest_api_init', array( $instance, 'register_rest_filters' ) ) !== false
 		);
 		$this->assertTrue(
+			has_filter( 'the_posts', array( $instance, 'capture_grouped_posts' ) ) !== false
+		);
+		$this->assertTrue(
+			has_filter( 'render_block_core/null', array( $instance, 'mark_grouped_item' ) ) !== false
+		);
+		$this->assertTrue(
 			has_filter( 'render_block_core/post-template', array( $instance, 'maybe_inject_year_headings' ) ) !== false
 		);
 	}
@@ -366,100 +372,265 @@ class BlockTest extends TestCase {
 	}
 
 	/**
-	 * Build an item as core's Post Template renders it.
+	 * A post object with a given year, as returned by WP_Query.
 	 *
-	 * @param int    $id     Post ID.
-	 * @param string $year   Year to mark the item with, or '' for none.
-	 * @param string $inside Item content.
+	 * @param int    $id   Post ID.
+	 * @param string $year Publication year.
 	 *
-	 * @return string
+	 * @return \stdClass
 	 */
-	private function item( int $id, string $year = '', string $inside = '' ): string {
-		$marker = '' === $year ? '' : sprintf( ' %s="%s"', Block::YEAR_MARKER, $year );
-		return sprintf( '<li%1$s class="wp-block-post post-%2$d post type-post">%3$s</li>', $marker, $id, '' === $inside ? "Post {$id}" : $inside );
+	private function post( int $id, string $year ): \stdClass {
+		$post            = new \stdClass();
+		$post->ID        = $id;
+		$post->post_date = "{$year}-11-18 10:00:00";
+		return $post;
 	}
 
 	/**
-	 * Posts are split into one list per year, each after a heading.
+	 * Render a grouping Post Template block the way core does, through the plugin's hooks.
+	 *
+	 * Mirrors render_block_core_post_template(): build the query vars, run the query,
+	 * render each post's inner blocks as `core/null`, wrap each in `<li>`, then apply
+	 * the block's render filter.
+	 *
+	 * @param Block             $instance Plugin instance.
+	 * @param array             $query    Query attributes in the block context.
+	 * @param \stdClass[]       $posts    Posts the query returns.
+	 * @param array<int,string> $contents Rendered inner content of each post, by index.
+	 *
+	 * @return string
 	 */
-	public function test_split_list_by_year_groups_items(): void {
+	private function render_post_template( Block $instance, array $query, array $posts, array $contents = array() ): string {
+		Functions\when( 'wp_timezone' )->justReturn( new DateTimeZone( 'UTC' ) );
+		Functions\when( 'get_the_date' )->alias(
+			static fn( $format, $post ) => substr( $post->post_date, 0, 4 )
+		);
 		Functions\stubEscapeFunctions();
 
-		$html = '<ul class="wp-block-post-template is-layout-grid">'
-			. $this->item( 1, '2024' ) . $this->item( 2 )
-			. $this->item( 3, '2020' )
-			. '</ul>';
+		$block               = new \WP_Block();
+		$block->name         = 'core/post-template';
+		$block->context      = array( 'query' => $query );
+		$block->parsed_block = $this->template_block();
 
-		$this->assertSame(
-			'<h3 class="wp-block-heading posts-on-this-day-year-heading">2024</h3>'
-			. '<ul class="wp-block-post-template is-layout-grid">' . $this->item( 1 ) . $this->item( 2 ) . '</ul>'
-			. '<h3 class="wp-block-heading posts-on-this-day-year-heading">2020</h3>'
-			. '<ul class="wp-block-post-template is-layout-grid">' . $this->item( 3 ) . '</ul>',
-			Block::split_list_by_year( $html, 3 )
+		$query_vars           = $instance->filter_query_vars( array( 'post_type' => 'post' ), $block );
+		$wp_query             = new \stdClass();
+		$wp_query->query_vars = $query_vars;
+		$posts                = $instance->capture_grouped_posts( $posts, $wp_query );
+
+		$html = '<ul class="wp-block-post-template is-layout-grid">';
+		foreach ( $posts as $index => $post ) {
+			$inner = $instance->mark_grouped_item( $contents[ $index ] ?? "Post {$post->ID}", $this->item_block() );
+			$html .= sprintf( '<li class="wp-block-post post-%d post type-post">%s</li>', $post->ID, $inner );
+		}
+		$html .= '</ul>';
+
+		return $instance->maybe_inject_year_headings( $html, array(), $block );
+	}
+
+	/**
+	 * Parsed Post Template block, as in the block's markup.
+	 *
+	 * @return array
+	 */
+	private function template_block(): array {
+		return array(
+			'blockName'   => 'core/post-template',
+			'attrs'       => array(),
+			'innerBlocks' => array(
+				array(
+					'blockName'   => 'core/post-title',
+					'attrs'       => array( 'isLink' => true ),
+					'innerBlocks' => array(),
+				),
+			),
 		);
 	}
 
 	/**
-	 * Lists nested in a post's content do not confuse the split.
+	 * The `core/null` copy core renders for each post of the Post Template block.
 	 *
-	 * The previous implementation parsed `<li>` tags with regular expressions and
-	 * depended on every nested list being well formed.
+	 * @return array
 	 */
-	public function test_split_list_by_year_keeps_nested_lists_intact(): void {
-		Functions\stubEscapeFunctions();
-
-		$nested = '<ul><li>One<li>Two</ul><p title="a > b">Text</p>';
-		$html   = '<ul class="list">' . $this->item( 1, '2024', $nested ) . $this->item( 2, '2023' ) . '</ul>';
-
-		$result = Block::split_list_by_year( $html, 2 );
-
-		$this->assertStringContainsString( $this->item( 1, '', $nested ) . '</ul><h2', $result );
-		$this->assertStringEndsWith( '<ul class="list">' . $this->item( 2 ) . '</ul>', $result );
-		$this->assertStringNotContainsString( Block::YEAR_MARKER, $result );
+	private function item_block(): array {
+		return array_merge( $this->template_block(), array( 'blockName' => 'core/null' ) );
 	}
 
 	/**
-	 * Only the first list keeps an HTML anchor, so IDs stay unique.
+	 * Expected markup for a heading.
+	 *
+	 * @param string $year  Year.
+	 * @param int    $level Heading level.
+	 *
+	 * @return string
 	 */
-	public function test_split_list_by_year_keeps_id_on_first_list_only(): void {
+	private function heading( string $year, int $level = 3 ): string {
+		return sprintf( '<h%1$d class="wp-block-heading posts-on-this-day-year-heading">%2$s</h%1$d>', $level, $year );
+	}
+
+	/**
+	 * Posts are split into one list per year, each after a heading, with no markers left behind.
+	 */
+	public function test_year_headings_group_posts(): void {
+		$result = $this->render_post_template(
+			new Block(),
+			array(
+				'yearsBack'   => 5,
+				'groupByYear' => true,
+			),
+			array( $this->post( 1, '2024' ), $this->post( 2, '2024' ), $this->post( 3, '2020' ) )
+		);
+
+		$list = '<ul class="wp-block-post-template is-layout-grid">';
+		$this->assertSame(
+			$this->heading( '2024' ) . $list
+			. '<li class="wp-block-post post-1 post type-post">Post 1</li>'
+			. '<li class="wp-block-post post-2 post type-post">Post 2</li></ul>'
+			. $this->heading( '2020' ) . $list
+			. '<li class="wp-block-post post-3 post type-post">Post 3</li></ul>',
+			$result
+		);
+	}
+
+	/**
+	 * Post content imitating a post item cannot add a heading or reveal another post's year.
+	 *
+	 * Regression test: headings used to take post IDs from `li.wp-block-post` classes anywhere
+	 * in the markup, so content with `<li class="wp-block-post post-123">` made the plugin look
+	 * up and print the year of any post, private ones included.
+	 */
+	public function test_year_headings_ignore_fake_post_items_in_content(): void {
+		$fake = '<ul><li class="wp-block-post post-999 post">Fake</li></ul><p>Text</p>';
+
+		$result = $this->render_post_template(
+			new Block(),
+			array(
+				'yearsBack'   => 5,
+				'groupByYear' => true,
+			),
+			array( $this->post( 1, '2024' ), $this->post( 2, '2023' ) ),
+			array( 0 => $fake )
+		);
+
+		$this->assertSame( 2, substr_count( $result, 'posts-on-this-day-year-heading' ) );
+		$this->assertStringContainsString( $this->heading( '2024' ), $result );
+		$this->assertStringContainsString( $this->heading( '2023' ), $result );
+		$this->assertStringContainsString( '<li class="wp-block-post post-1 post type-post">' . $fake . '</li></ul>' . $this->heading( '2023' ), $result );
+	}
+
+	/**
+	 * Post content imitating the plugin's markers cannot move or add headings.
+	 *
+	 * Regression test: the split points used to be found again with a regex over the whole
+	 * markup, so content carrying the same marker could choose where lists were split.
+	 */
+	public function test_year_headings_ignore_fake_markers_in_content(): void {
+		$fake = '<li data-posts-on-this-day-year="1999">x</li><!--posts-on-this-day:00000000000000000000000000000000:1-->';
+
+		$result = $this->render_post_template(
+			new Block(),
+			array(
+				'yearsBack'   => 5,
+				'groupByYear' => true,
+			),
+			array( $this->post( 1, '2024' ), $this->post( 2, '2024' ) ),
+			array( 0 => $fake )
+		);
+
+		$this->assertSame( 1, substr_count( $result, 'posts-on-this-day-year-heading' ) );
+		$this->assertStringStartsWith( $this->heading( '2024' ), $result );
+		$this->assertStringNotContainsString( '1999</h', $result );
+		$this->assertStringContainsString( $fake, $result );
+	}
+
+	/**
+	 * Items of a loop nested inside a post are not taken for the block's own items.
+	 *
+	 * Their `core/null` blocks render before the outer post's, so marking them would split
+	 * the list inside that post.
+	 */
+	public function test_year_headings_ignore_items_of_nested_loops(): void {
+		$instance = new Block();
+		$block    = new \WP_Block();
+
+		$block->name         = 'core/post-template';
+		$block->parsed_block = $this->template_block();
+		$block->context      = array(
+			'query' => array(
+				'yearsBack'   => 5,
+				'groupByYear' => true,
+			),
+		);
+
+		Functions\when( 'wp_timezone' )->justReturn( new DateTimeZone( 'UTC' ) );
+		Functions\when( 'get_the_date' )->alias( static fn( $format, $post ) => substr( $post->post_date, 0, 4 ) );
 		Functions\stubEscapeFunctions();
 
-		$html   = '<ul id="memories" class="list">' . $this->item( 1, '2024' ) . $this->item( 2, '2023' ) . '</ul>';
-		$result = Block::split_list_by_year( $html, 3 );
+		$wp_query             = new \stdClass();
+		$wp_query->query_vars = $instance->filter_query_vars( array( 'post_type' => 'post' ), $block );
+		$instance->capture_grouped_posts( array( $this->post( 1, '2024' ), $this->post( 2, '2023' ) ), $wp_query );
+
+		$nested_block = array(
+			'blockName'   => 'core/null',
+			'attrs'       => array(),
+			'innerBlocks' => array( array( 'blockName' => 'core/post-excerpt' ) ),
+		);
+		$nested       = $instance->mark_grouped_item( 'Nested', $nested_block );
+		$first        = $instance->mark_grouped_item( 'One<ul><li>' . $nested . '</li></ul>', $this->item_block() );
+		$second       = $instance->mark_grouped_item( 'Two', $this->item_block() );
+		$html         = '<ul><li class="wp-block-post post-1">' . $first . '</li><li class="wp-block-post post-2">' . $second . '</li></ul>';
+
+		$this->assertSame(
+			$this->heading( '2024' ) . '<ul><li class="wp-block-post post-1">One<ul><li>Nested</li></ul></li></ul>'
+			. $this->heading( '2023' ) . '<ul><li class="wp-block-post post-2">Two</li></ul>',
+			$instance->maybe_inject_year_headings( $html, array(), $block )
+		);
+	}
+
+	/**
+	 * More markers than posts leaves the list alone.
+	 */
+	public function test_split_list_by_year_rejects_extra_items(): void {
+		$token = str_repeat( 'c', 32 );
+		$html  = '<ul><li class="wp-block-post post-1"><!--posts-on-this-day:' . $token . ':0-->One'
+			. '<ul><li><!--posts-on-this-day:' . $token . ':1-->Nested</li></ul></li></ul>';
+
+		$this->assertNull( Block::split_list_by_year( $html, $token, array( '2024' ), 3 ) );
+	}
+
+	/**
+	 * Only the first list keeps an HTML anchor, so IDs stay unique, and heading levels are clamped.
+	 */
+	public function test_split_list_by_year_keeps_id_on_first_list_and_clamps_level(): void {
+		Functions\stubEscapeFunctions();
+
+		$token = str_repeat( 'a', 32 );
+		$html  = '<ul id="memories" class="list">'
+			. '<li class="wp-block-post post-1"><!--posts-on-this-day:' . $token . ':0-->One</li>'
+			. '<li class="wp-block-post post-2"><!--posts-on-this-day:' . $token . ':1-->Two</li></ul>';
+
+		$result = Block::split_list_by_year( $html, $token, array( '2024', '2023' ), 9 );
 
 		$this->assertSame( 1, substr_count( $result, 'id="memories"' ) );
-		$this->assertSame( 2, substr_count( $result, '<ul class="list">' ) + substr_count( $result, '<ul id="memories" class="list">' ) );
+		$this->assertStringStartsWith( '<h6 ', $result );
+		$this->assertStringContainsString( '</ul><h6 class="wp-block-heading posts-on-this-day-year-heading">2023</h6><ul class="list">', $result );
+		$this->assertStringNotContainsString( $token, $result );
 	}
 
 	/**
-	 * Heading levels outside of h2 to h6 are clamped.
+	 * A marker that does not directly follow its item's opening tag leaves the list alone.
 	 */
-	public function test_split_list_by_year_clamps_heading_level(): void {
-		Functions\stubEscapeFunctions();
+	public function test_split_list_by_year_rejects_misplaced_markers(): void {
+		$token = str_repeat( 'b', 32 );
+		$html  = '<ul><li class="wp-block-post post-1"><p>Intro</p><!--posts-on-this-day:' . $token . ':0-->One</li></ul>';
 
-		$html = '<ul>' . $this->item( 1, '2024' ) . '</ul>';
-
-		$this->assertStringStartsWith( '<h2 ', Block::split_list_by_year( $html, 1 ) );
-		$this->assertStringStartsWith( '<h6 ', Block::split_list_by_year( $html, 9 ) );
+		$this->assertNull( Block::split_list_by_year( $html, $token, array( '2024' ), 3 ) );
 	}
 
 	/**
-	 * Unexpected markup is left alone.
+	 * Headings are only added when the block asks for them, sorted by date.
 	 */
-	public function test_split_list_by_year_bails_on_unexpected_markup(): void {
-		$this->assertNull( Block::split_list_by_year( '<ul>' . $this->item( 1 ) . '</ul>', 3 ) );
-		$this->assertNull( Block::split_list_by_year( '<div><p>Intro</p>' . $this->item( 1, '2024' ) . '</div>', 3 ) );
-	}
-
-	/**
-	 * Headings are only added when the block asks for them.
-	 */
-	public function test_maybe_inject_year_headings_skips_when_not_grouping(): void {
-		$content = '<ul>' . $this->item( 1 ) . '</ul>';
-		$block   = new \WP_Block();
-
+	public function test_year_headings_only_when_requested(): void {
 		$cases = array(
-			'not our variation'  => array( 'groupByYear' => true ),
 			'grouping off'       => array(
 				'yearsBack'   => 5,
 				'groupByYear' => false,
@@ -471,16 +642,24 @@ class BlockTest extends TestCase {
 			),
 		);
 
-		$cases['marker already in content'] = array(
-			'yearsBack'   => 5,
-			'groupByYear' => true,
-		);
-		$content_with_marker                = '<ul>' . $this->item( 1, '1999' ) . '</ul>';
-
 		foreach ( $cases as $label => $query ) {
-			$html           = 'marker already in content' === $label ? $content_with_marker : $content;
-			$block->context = array( 'query' => $query );
-			$this->assertSame( $html, ( new Block() )->maybe_inject_year_headings( $html, array(), $block ), $label );
+			$result = $this->render_post_template( new Block(), $query, array( $this->post( 1, '2024' ) ) );
+			$this->assertSame( '<ul class="wp-block-post-template is-layout-grid"><li class="wp-block-post post-1 post type-post">Post 1</li></ul>', $result, $label );
 		}
+	}
+
+	/**
+	 * Other Query Loop blocks never get markers or headings.
+	 */
+	public function test_other_post_templates_are_left_alone(): void {
+		$instance = new Block();
+
+		$this->assertSame( 'Content', $instance->mark_grouped_item( 'Content', $this->item_block() ) );
+
+		$block          = new \WP_Block();
+		$block->name    = 'core/post-template';
+		$block->context = array( 'query' => array( 'postType' => 'post' ) );
+
+		$this->assertSame( '<ul></ul>', $instance->maybe_inject_year_headings( '<ul></ul>', array(), $block ) );
 	}
 }

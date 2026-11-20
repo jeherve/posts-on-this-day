@@ -34,11 +34,22 @@ class Block {
 	const MAX_YEARS_BACK = 100;
 
 	/**
-	 * Attribute temporarily set on the first post of each year, to split the list there.
+	 * Query var flagging the queries of blocks that group posts by year.
 	 *
 	 * @var string
 	 */
-	const YEAR_MARKER = 'data-posts-on-this-day-year';
+	const GROUP_QUERY_FLAG = 'posts_on_this_day_group_by_year';
+
+	/**
+	 * Post Template blocks currently rendering with year headings, keyed by block instance.
+	 *
+	 * Each entry holds a random token for its item markers, the block's inner blocks
+	 * (to recognise its own items), the year of each post the block's query returned
+	 * (in order), and how many items were marked so far.
+	 *
+	 * @var array<int, array{token: string, inner_blocks: array, years: string[]|null, marked: int}>
+	 */
+	private array $groupings = array();
 
 	/**
 	 * Initialize hooks.
@@ -50,6 +61,8 @@ class Block {
 		add_filter( 'render_block_data', array( $this, 'force_custom_query' ) );
 		add_filter( 'query_loop_block_query_vars', array( $this, 'filter_query_vars' ), 10, 2 );
 		add_action( 'rest_api_init', array( $this, 'register_rest_filters' ) );
+		add_filter( 'the_posts', array( $this, 'capture_grouped_posts' ), 10, 2 );
+		add_filter( 'render_block_core/null', array( $this, 'mark_grouped_item' ), 10, 2 );
 		add_filter( 'render_block_core/post-template', array( $this, 'maybe_inject_year_headings' ), 10, 3 );
 	}
 
@@ -126,7 +139,19 @@ class Block {
 			return $query;
 		}
 
-		return self::add_query_args( $query, $block_query['yearsBack'], $block_query['exactMatch'] ?? false );
+		$query = self::add_query_args( $query, $block_query['yearsBack'], $block_query['exactMatch'] ?? false );
+
+		if ( self::groups_by_year( $block_query ) && $block instanceof WP_Block && 'core/post-template' === $block->name ) {
+			$this->groupings[ spl_object_id( $block ) ] = array(
+				'token'        => bin2hex( random_bytes( 16 ) ),
+				'inner_blocks' => $block->parsed_block['innerBlocks'] ?? array(),
+				'years'        => null,
+				'marked'       => 0,
+			);
+			$query[ self::GROUP_QUERY_FLAG ]            = true;
+		}
+
+		return $query;
 	}
 
 	/**
@@ -213,15 +238,93 @@ class Block {
 	}
 
 	/**
-	 * Group the rendered posts by year, with a heading before each group.
-	 *
-	 * Core renders the Post Template block as one `<ul>` with an `<li class="wp-block-post post-{ID} …">`
-	 * per post. Each item's year comes from that post ID (the posts are already in the
-	 * object cache), so this needs no extra query. The list is then split into one list
-	 * per year, each copying the original list's attributes.
+	 * Whether a block's query asks for year headings.
 	 *
 	 * Grouping only applies when posts are sorted by date; with any other order, years
 	 * would repeat and the headings would not mean much.
+	 *
+	 * @param array $block_query The block's query attributes.
+	 *
+	 * @return bool
+	 */
+	private static function groups_by_year( array $block_query ): bool {
+		return ! empty( $block_query['groupByYear'] )
+			&& ( ! isset( $block_query['orderBy'] ) || 'date' === $block_query['orderBy'] );
+	}
+
+	/**
+	 * Record the year of each post a grouping block's query returned, in order.
+	 *
+	 * This is the only source of years for the headings: nothing is read back from the
+	 * rendered markup, which includes post content.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param array  $posts Posts returned by the query.
+	 * @param object $query The WP_Query instance.
+	 *
+	 * @return array The posts, unchanged.
+	 */
+	public function capture_grouped_posts( $posts, $query ) {
+		$key = array_key_last( $this->groupings );
+
+		if (
+			null === $key
+			|| null !== $this->groupings[ $key ]['years']
+			|| empty( $query->query_vars[ self::GROUP_QUERY_FLAG ] )
+			|| ! is_array( $posts )
+		) {
+			return $posts;
+		}
+
+		$this->groupings[ $key ]['years'] = array_map(
+			static fn( $post ) => (string) get_the_date( 'Y', $post ),
+			$posts
+		);
+
+		return $posts;
+	}
+
+	/**
+	 * Mark the start of each post rendered by a grouping Post Template block.
+	 *
+	 * Core renders each post's inner blocks as a `core/null` copy of the Post Template
+	 * block, then wraps the result in `<li …>`. Loops nested inside a post render their
+	 * own `core/null` items first; comparing inner blocks keeps those unmarked. The marker
+	 * carries a random token created for this render, so post content cannot contain or
+	 * imitate it.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param string $content      The rendered content of one post.
+	 * @param array  $parsed_block The `core/null` copy of the Post Template block.
+	 *
+	 * @return string
+	 */
+	public function mark_grouped_item( $content, $parsed_block = array() ) {
+		$key = array_key_last( $this->groupings );
+
+		if (
+			null === $key
+			|| null === $this->groupings[ $key ]['years']
+			|| ( $parsed_block['innerBlocks'] ?? null ) !== $this->groupings[ $key ]['inner_blocks']
+		) {
+			return $content;
+		}
+
+		$state = &$this->groupings[ $key ];
+		if ( $state['marked'] >= count( $state['years'] ) ) {
+			return $content;
+		}
+
+		$marker = self::item_marker( $state['token'], $state['marked'] );
+		++$state['marked'];
+
+		return $marker . $content;
+	}
+
+	/**
+	 * Group the rendered posts by year, with a heading before each group.
 	 *
 	 * @since 2.0.0
 	 *
@@ -232,115 +335,146 @@ class Block {
 	 * @return string Modified content with year headings.
 	 */
 	public function maybe_inject_year_headings( string $content, array $parsed_block, WP_Block $block ): string {
+		$key = spl_object_id( $block );
+
+		if ( ! isset( $this->groupings[ $key ] ) ) {
+			return $content;
+		}
+
+		$state = $this->groupings[ $key ];
+		unset( $this->groupings[ $key ] );
+
+		if ( '' === $content || empty( $state['years'] ) ) {
+			return self::remove_item_markers( $content, $state['token'] );
+		}
+
 		$query = $block->context['query'] ?? array();
 
-		// Content that already contains the marker (typed into a post) would make the split ambiguous.
-		if (
-			'' === $content
-			|| str_contains( $content, self::YEAR_MARKER )
-			|| ! is_array( $query )
-			|| ! array_key_exists( 'yearsBack', $query )
-			|| empty( $query['groupByYear'] )
-			|| ( isset( $query['orderBy'] ) && 'date' !== $query['orderBy'] )
-		) {
-			return $content;
-		}
-
-		$processor = new \WP_HTML_Tag_Processor( $content );
-
-		if ( ! $processor->next_tag() || 'UL' !== $processor->get_tag() ) {
-			return $content;
-		}
-
-		$current_year = null;
-		while ( $processor->next_tag( 'LI' ) ) {
-			if ( ! $processor->has_class( 'wp-block-post' ) ) {
-				continue;
-			}
-
-			$post_id = self::get_post_id_from_classes( (string) $processor->get_attribute( 'class' ) );
-			if ( ! $post_id ) {
-				return $content;
-			}
-
-			$year = (string) get_the_date( 'Y', $post_id );
-			if ( $year !== $current_year ) {
-				$processor->set_attribute( self::YEAR_MARKER, $year );
-				$current_year = $year;
-			}
-		}
-
 		return self::split_list_by_year(
-			$processor->get_updated_html(),
+			$content,
+			$state['token'],
+			$state['years'],
 			(int) ( $query['yearHeadingLevel'] ?? 3 )
-		) ?? $content;
+		) ?? self::remove_item_markers( $content, $state['token'] );
 	}
 
 	/**
-	 * Split a post list at each item marked with the year it starts.
+	 * Split a rendered post list into one list per year, each after a heading.
+	 *
+	 * Every item must carry its marker exactly once, in order, right after its own `<li …>`
+	 * opening tag, and there must be one item per post the query returned. Anything else
+	 * (a nested loop inside a post, unexpected markup) leaves the list as it is.
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param string $html          A single `<ul>` whose items starting a new year carry the YEAR_MARKER attribute.
-	 * @param int    $heading_level Heading level for the years, from 2 to 6.
+	 * @param string   $html          The Post Template block's markup: one `<ul>` of marked items.
+	 * @param string   $token         Marker token for this render.
+	 * @param string[] $years         Year of each post, in the order they were rendered.
+	 * @param int      $heading_level Heading level for the years, from 2 to 6.
 	 *
 	 * @return string|null The grouped markup, or null when the markup is not shaped as expected.
 	 */
-	public static function split_list_by_year( string $html, int $heading_level ): ?string {
-		if ( ! preg_match_all( '/\s' . self::YEAR_MARKER . '="(\d+)"/', $html, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE ) ) {
+	public static function split_list_by_year( string $html, string $token, array $years, int $heading_level ): ?string {
+		$count = count( $years );
+
+		// One marker per post: more means items from a loop nested inside a post.
+		if ( 0 === $count || substr_count( $html, self::marker_prefix( $token ) ) !== $count ) {
 			return null;
 		}
 
-		$groups = array();
-		foreach ( $matches as $match ) {
-			$item_start = strrpos( substr( $html, 0, $match[0][1] ), '<li' );
-			if ( false === $item_start ) {
+		$starts   = array();
+		$previous = 0;
+		for ( $index = 0; $index < $count; $index++ ) {
+			$marker   = self::item_marker( $token, $index );
+			$position = strpos( $html, $marker, $previous );
+			if ( false === $position ) {
 				return null;
 			}
 
-			$groups[] = array(
-				'start'  => $item_start,
-				'year'   => $match[1][0],
-				'marker' => $match[0][0],
-			);
+			// Core's item tag is `<li …>` with escaped attributes, directly followed by the marker.
+			$item_start = strrpos( substr( $html, 0, $position ), '<li' );
+			if (
+				false === $item_start
+				|| $item_start < $previous
+				|| ! preg_match( '/^<li\b[^<>]*>$/', substr( $html, $item_start, $position - $item_start ) )
+			) {
+				return null;
+			}
+
+			$starts[] = $item_start;
+			$previous = $position + strlen( $marker );
 		}
 
-		$list_open  = substr( $html, 0, $groups[0]['start'] );
+		$list_open  = substr( $html, 0, $starts[0] );
 		$list_close = strrpos( $html, '</ul>' );
-		if ( false === $list_close || ! preg_match( '/^\s*<ul\b[^>]*>\s*$/', $list_open ) ) {
+		if (
+			false === $list_close
+			|| $list_close < $previous
+			|| ! preg_match( '/^\s*<ul\b[^<>]*>\s*$/', $list_open )
+			|| '' !== trim( substr( $html, $list_close + strlen( '</ul>' ) ) )
+		) {
 			return null;
 		}
 
 		// Later lists must not repeat the first list's anchor. Block wrapper attributes are always double-quoted.
 		$later_list_open = preg_replace( '/\sid="[^"]*"/', '', $list_open, 1 );
+		$heading_level   = max( 2, min( 6, $heading_level ) );
+		$output          = '';
 
-		$heading_level = max( 2, min( 6, $heading_level ) );
-		$output        = '';
+		for ( $index = 0; $index < $count; $index++ ) {
+			$end  = $starts[ $index + 1 ] ?? $list_close;
+			$item = str_replace( self::item_marker( $token, $index ), '', substr( $html, $starts[ $index ], $end - $starts[ $index ] ) );
 
-		foreach ( $groups as $index => $group ) {
-			$end   = $groups[ $index + 1 ]['start'] ?? $list_close;
-			$items = substr( $html, $group['start'], $end - $group['start'] );
-			$items = preg_replace( '/' . preg_quote( $group['marker'], '/' ) . '/', '', $items, 1 );
+			if ( 0 === $index || $years[ $index ] !== $years[ $index - 1 ] ) {
+				if ( 0 !== $index ) {
+					$output .= '</ul>';
+				}
+				$output .= sprintf(
+					'<h%1$d class="wp-block-heading posts-on-this-day-year-heading">%2$s</h%1$d>',
+					$heading_level,
+					esc_html( $years[ $index ] )
+				);
+				$output .= 0 === $index ? $list_open : $later_list_open;
+			}
 
-			$output .= sprintf(
-				'<h%1$d class="wp-block-heading posts-on-this-day-year-heading">%2$s</h%1$d>',
-				$heading_level,
-				esc_html( $group['year'] )
-			);
-			$output .= ( 0 === $index ? $list_open : $later_list_open ) . $items . '</ul>';
+			$output .= $item;
 		}
 
-		return $output . substr( $html, $list_close + strlen( '</ul>' ) );
+		return $output . '</ul>';
 	}
 
 	/**
-	 * Get the post ID from the `post-{ID}` class core adds to each post.
+	 * Build the marker placed at the start of a post's rendered content.
 	 *
-	 * @param string $classes Space-separated class names.
+	 * @param string $token Marker token for this render.
+	 * @param int    $index Position of the post in the list.
 	 *
-	 * @return int Post ID, or 0 when there is none.
+	 * @return string
 	 */
-	private static function get_post_id_from_classes( string $classes ): int {
-		return preg_match( '/(?:^|\s)post-(\d+)(?:\s|$)/', $classes, $match ) ? (int) $match[1] : 0;
+	private static function item_marker( string $token, int $index ): string {
+		return self::marker_prefix( $token ) . $index . '-->';
+	}
+
+	/**
+	 * Build the part of the item markers shared by every post in one render.
+	 *
+	 * @param string $token Marker token for this render.
+	 *
+	 * @return string
+	 */
+	private static function marker_prefix( string $token ): string {
+		return '<!--posts-on-this-day:' . $token . ':';
+	}
+
+	/**
+	 * Remove this render's item markers.
+	 *
+	 * @param string $html  Markup.
+	 * @param string $token Marker token for this render.
+	 *
+	 * @return string
+	 */
+	private static function remove_item_markers( string $html, string $token ): string {
+		return (string) preg_replace( '/' . preg_quote( self::marker_prefix( $token ), '/' ) . '\d+-->/', '', $html );
 	}
 }

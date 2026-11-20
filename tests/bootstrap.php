@@ -83,6 +83,20 @@ if ( ! class_exists( 'WP_Block' ) ) {
 	 */
 	class WP_Block {
 		/**
+		 * Block name.
+		 *
+		 * @var string
+		 */
+		public $name = '';
+
+		/**
+		 * Parsed block data.
+		 *
+		 * @var array
+		 */
+		public $parsed_block = array();
+
+		/**
 		 * Block context values.
 		 *
 		 * @var array
