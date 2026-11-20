@@ -59,15 +59,19 @@ You have 3 ways to do so.
 == Screenshots ==
 
 1. Widget settings
+2. The Posts On This Day block in the editor, with its settings
+3. Posts grouped by year on the site
 
 == Changelog ==
 
-### [2.0.0] - 2026-02-27
+### [2.0.0] - 2026-11-20
 
 * New: "Posts On This Day" is now available as a block for use in the block editor and block-based themes. It can look back over every year since your first post, and group posts under year headings.
 * Query: posts published on this very day in past years now appear when looking for posts within a week. They used to be left out.
 * Query: on 29 February, years without a leap day show posts from 28 February. On 28 February, posts from 29 February in past leap years show too.
+* Query: sticky posts are no longer added to the list whatever their date.
 * General: the plugin now requires WordPress 7.0 or later.
+* General: update the Jetpack Autoloader to version 6.
 
 ### [1.5.7] - 2026-02-27
 
