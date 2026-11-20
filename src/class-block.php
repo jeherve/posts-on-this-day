@@ -34,6 +34,13 @@ class Block {
 	const MAX_YEARS_BACK = 100;
 
 	/**
+	 * Attribute temporarily set on the first post of each year, to split the list there.
+	 *
+	 * @var string
+	 */
+	const YEAR_MARKER = 'data-posts-on-this-day-year';
+
+	/**
 	 * Initialize hooks.
 	 *
 	 * @since 2.0.0
@@ -205,10 +212,15 @@ class Block {
 	}
 
 	/**
-	 * Inject year headings into the post-template output when groupByYear is enabled.
+	 * Group the rendered posts by year, with a heading before each group.
 	 *
-	 * Post-processes the rendered HTML from core/post-template to split the post list
-	 * into year-grouped sections with heading elements between them.
+	 * Core renders the Post Template block as one `<ul>` with an `<li class="wp-block-post post-{ID} …">`
+	 * per post. Each item's year comes from that post ID (the posts are already in the
+	 * object cache), so this needs no extra query. The list is then split into one list
+	 * per year, each copying the original list's attributes.
+	 *
+	 * Grouping only applies when posts are sorted by date; with any other order, years
+	 * would repeat and the headings would not mean much.
 	 *
 	 * @since 2.0.0
 	 *
@@ -219,109 +231,113 @@ class Block {
 	 * @return string Modified content with year headings.
 	 */
 	public function maybe_inject_year_headings( string $content, array $parsed_block, WP_Block $block ): string {
-		$query_context = $block->context['query'] ?? array();
+		$query = $block->context['query'] ?? array();
 
-		if ( empty( $query_context['yearsBack'] ) || empty( $query_context['groupByYear'] ) ) {
+		if (
+			'' === $content
+			|| ! is_array( $query )
+			|| ! array_key_exists( 'yearsBack', $query )
+			|| empty( $query['groupByYear'] )
+			|| ( isset( $query['orderBy'] ) && 'date' !== $query['orderBy'] )
+		) {
 			return $content;
 		}
 
-		$heading_level = (int) ( $query_context['yearHeadingLevel'] ?? 3 );
-		$heading_level = max( 2, min( 6, $heading_level ) );
+		$processor = new \WP_HTML_Tag_Processor( $content );
 
-		// Re-build the query to determine post years in display order.
-		$page       = absint( $block->context['page'] ?? 1 );
-		$query_args = build_query_vars_from_query_block( $block, $page );
-
-		// build_query_vars_from_query_block only extracts core's known properties,
-		// so we need to add our date filter manually for the re-query.
-		$years_back  = (int) ( $query_context['yearsBack'] ?? 10 );
-		$exact_match = (bool) ( $query_context['exactMatch'] ?? false );
-
-		$query_args['date_query']   = Query::build_date_query( $years_back, $exact_match );
-		$query_args['has_password'] = false;
-
-		$posts_query = new \WP_Query( $query_args );
-
-		if ( ! $posts_query->have_posts() ) {
+		if ( ! $processor->next_tag() || 'UL' !== $processor->get_tag() ) {
 			return $content;
 		}
 
-		// Map each post position to its year.
-		$year_map = array();
-		while ( $posts_query->have_posts() ) {
-			$posts_query->the_post();
-			$year_map[] = get_the_date( 'Y' );
-		}
-		wp_reset_postdata();
-
-		// Extract the <ul> wrapper attributes.
-		preg_match( '/<ul([^>]*)>/', $content, $ul_match );
-		$ul_attrs = $ul_match[1] ?? '';
-
-		// Extract top-level <li>…</li> items by tracking nesting depth,
-		// so nested lists inside post content/excerpts are handled correctly.
-		$items      = array();
-		$offset     = 0;
-		$depth      = 0;
-		$item_start = 0;
-
-		while ( preg_match( '/<(\/?)li\b[^>]*>/si', $content, $match, PREG_OFFSET_CAPTURE, $offset ) ) {
-			$tag        = $match[0][0];
-			$pos        = $match[0][1];
-			$is_closing = '/' === $match[1][0];
-
-			if ( ! $is_closing ) {
-				if ( 0 === $depth ) {
-					$item_start = $pos;
-				}
-				++$depth;
-			} else {
-				--$depth;
-				if ( 0 === $depth ) {
-					$items[] = substr( $content, $item_start, $pos + strlen( $tag ) - $item_start );
-				}
+		$current_year = null;
+		while ( $processor->next_tag( 'LI' ) ) {
+			if ( ! $processor->has_class( 'wp-block-post' ) ) {
+				continue;
 			}
 
-			$offset = $pos + strlen( $tag );
-		}
+			$post_id = self::get_post_id_from_classes( (string) $processor->get_attribute( 'class' ) );
+			if ( ! $post_id ) {
+				return $content;
+			}
 
-		if ( empty( $items ) ) {
-			return $content;
-		}
-
-		// Rebuild the output with year headings between groups.
-		$output       = '';
-		$current_year = '';
-		$group_items  = array();
-
-		foreach ( $items as $index => $item ) {
-			$year = $year_map[ $index ] ?? '';
-
-			if ( $year !== $current_year && '' !== $year ) {
-				// Close the previous year group.
-				if ( ! empty( $group_items ) ) {
-					$output .= '<ul' . $ul_attrs . '>' . implode( '', $group_items ) . '</ul>';
-				}
-
-				// Add the year heading.
-				$output .= sprintf(
-					'<%1$s class="posts-on-this-day-year-heading">%2$s</%1$s>',
-					'h' . $heading_level,
-					esc_html( $year )
-				);
-
+			$year = (string) get_the_date( 'Y', $post_id );
+			if ( $year !== $current_year ) {
+				$processor->set_attribute( self::YEAR_MARKER, $year );
 				$current_year = $year;
-				$group_items  = array();
+			}
+		}
+
+		return self::split_list_by_year(
+			$processor->get_updated_html(),
+			(int) ( $query['yearHeadingLevel'] ?? 3 )
+		) ?? $content;
+	}
+
+	/**
+	 * Split a post list at each item marked with the year it starts.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param string $html          A single `<ul>` whose items starting a new year carry the YEAR_MARKER attribute.
+	 * @param int    $heading_level Heading level for the years, from 2 to 6.
+	 *
+	 * @return string|null The grouped markup, or null when the markup is not shaped as expected.
+	 */
+	public static function split_list_by_year( string $html, int $heading_level ): ?string {
+		if ( ! preg_match_all( '/\s' . self::YEAR_MARKER . '="(\d+)"/', $html, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE ) ) {
+			return null;
+		}
+
+		$groups = array();
+		foreach ( $matches as $match ) {
+			$item_start = strrpos( substr( $html, 0, $match[0][1] ), '<li' );
+			if ( false === $item_start ) {
+				return null;
 			}
 
-			$group_items[] = $item;
+			$groups[] = array(
+				'start'  => $item_start,
+				'year'   => $match[1][0],
+				'marker' => $match[0][0],
+			);
 		}
 
-		// Close the last year group.
-		if ( ! empty( $group_items ) ) {
-			$output .= '<ul' . $ul_attrs . '>' . implode( '', $group_items ) . '</ul>';
+		$list_open  = substr( $html, 0, $groups[0]['start'] );
+		$list_close = strrpos( $html, '</ul>' );
+		if ( false === $list_close || ! preg_match( '/^\s*<ul\b[^>]*>\s*$/', $list_open ) ) {
+			return null;
 		}
 
-		return $output;
+		// Later lists must not repeat the first list's anchor. Block wrapper attributes are always double-quoted.
+		$later_list_open = preg_replace( '/\sid="[^"]*"/', '', $list_open, 1 );
+
+		$heading_level = max( 2, min( 6, $heading_level ) );
+		$output        = '';
+
+		foreach ( $groups as $index => $group ) {
+			$end   = $groups[ $index + 1 ]['start'] ?? $list_close;
+			$items = substr( $html, $group['start'], $end - $group['start'] );
+			$items = preg_replace( '/' . preg_quote( $group['marker'], '/' ) . '/', '', $items, 1 );
+
+			$output .= sprintf(
+				'<h%1$d class="wp-block-heading posts-on-this-day-year-heading">%2$s</h%1$d>',
+				$heading_level,
+				esc_html( $group['year'] )
+			);
+			$output .= ( 0 === $index ? $list_open : $later_list_open ) . $items . '</ul>';
+		}
+
+		return $output . substr( $html, $list_close + strlen( '</ul>' ) );
+	}
+
+	/**
+	 * Get the post ID from the `post-{ID}` class core adds to each post.
+	 *
+	 * @param string $classes Space-separated class names.
+	 *
+	 * @return int Post ID, or 0 when there is none.
+	 */
+	private static function get_post_id_from_classes( string $classes ): int {
+		return preg_match( '/(?:^|\s)post-(\d+)(?:\s|$)/', $classes, $match ) ? (int) $match[1] : 0;
 	}
 }

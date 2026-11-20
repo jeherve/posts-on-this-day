@@ -350,4 +350,116 @@ class BlockTest extends TestCase {
 			$this->assertSame( $result['date_query'][ $i ]['before'], $result['date_query'][ $i ]['after'] );
 		}
 	}
+
+	/**
+	 * Build an item as core's Post Template renders it.
+	 *
+	 * @param int    $id     Post ID.
+	 * @param string $year   Year to mark the item with, or '' for none.
+	 * @param string $inside Item content.
+	 *
+	 * @return string
+	 */
+	private function item( int $id, string $year = '', string $inside = '' ): string {
+		$marker = '' === $year ? '' : sprintf( ' %s="%s"', Block::YEAR_MARKER, $year );
+		return sprintf( '<li%1$s class="wp-block-post post-%2$d post type-post">%3$s</li>', $marker, $id, '' === $inside ? "Post {$id}" : $inside );
+	}
+
+	/**
+	 * Posts are split into one list per year, each after a heading.
+	 */
+	public function test_split_list_by_year_groups_items(): void {
+		Functions\stubEscapeFunctions();
+
+		$html = '<ul class="wp-block-post-template is-layout-grid">'
+			. $this->item( 1, '2024' ) . $this->item( 2 )
+			. $this->item( 3, '2020' )
+			. '</ul>';
+
+		$this->assertSame(
+			'<h3 class="wp-block-heading posts-on-this-day-year-heading">2024</h3>'
+			. '<ul class="wp-block-post-template is-layout-grid">' . $this->item( 1 ) . $this->item( 2 ) . '</ul>'
+			. '<h3 class="wp-block-heading posts-on-this-day-year-heading">2020</h3>'
+			. '<ul class="wp-block-post-template is-layout-grid">' . $this->item( 3 ) . '</ul>',
+			Block::split_list_by_year( $html, 3 )
+		);
+	}
+
+	/**
+	 * Lists nested in a post's content do not confuse the split.
+	 *
+	 * The previous implementation parsed `<li>` tags with regular expressions and
+	 * depended on every nested list being well formed.
+	 */
+	public function test_split_list_by_year_keeps_nested_lists_intact(): void {
+		Functions\stubEscapeFunctions();
+
+		$nested = '<ul><li>One<li>Two</ul><p title="a > b">Text</p>';
+		$html   = '<ul class="list">' . $this->item( 1, '2024', $nested ) . $this->item( 2, '2023' ) . '</ul>';
+
+		$result = Block::split_list_by_year( $html, 2 );
+
+		$this->assertStringContainsString( $this->item( 1, '', $nested ) . '</ul><h2', $result );
+		$this->assertStringEndsWith( '<ul class="list">' . $this->item( 2 ) . '</ul>', $result );
+		$this->assertStringNotContainsString( Block::YEAR_MARKER, $result );
+	}
+
+	/**
+	 * Only the first list keeps an HTML anchor, so IDs stay unique.
+	 */
+	public function test_split_list_by_year_keeps_id_on_first_list_only(): void {
+		Functions\stubEscapeFunctions();
+
+		$html   = '<ul id="memories" class="list">' . $this->item( 1, '2024' ) . $this->item( 2, '2023' ) . '</ul>';
+		$result = Block::split_list_by_year( $html, 3 );
+
+		$this->assertSame( 1, substr_count( $result, 'id="memories"' ) );
+		$this->assertSame( 2, substr_count( $result, '<ul class="list">' ) + substr_count( $result, '<ul id="memories" class="list">' ) );
+	}
+
+	/**
+	 * Heading levels outside of h2 to h6 are clamped.
+	 */
+	public function test_split_list_by_year_clamps_heading_level(): void {
+		Functions\stubEscapeFunctions();
+
+		$html = '<ul>' . $this->item( 1, '2024' ) . '</ul>';
+
+		$this->assertStringStartsWith( '<h2 ', Block::split_list_by_year( $html, 1 ) );
+		$this->assertStringStartsWith( '<h6 ', Block::split_list_by_year( $html, 9 ) );
+	}
+
+	/**
+	 * Unexpected markup is left alone.
+	 */
+	public function test_split_list_by_year_bails_on_unexpected_markup(): void {
+		$this->assertNull( Block::split_list_by_year( '<ul>' . $this->item( 1 ) . '</ul>', 3 ) );
+		$this->assertNull( Block::split_list_by_year( '<div><p>Intro</p>' . $this->item( 1, '2024' ) . '</div>', 3 ) );
+	}
+
+	/**
+	 * Headings are only added when the block asks for them.
+	 */
+	public function test_maybe_inject_year_headings_skips_when_not_grouping(): void {
+		$content = '<ul>' . $this->item( 1 ) . '</ul>';
+		$block   = new \WP_Block();
+
+		$cases = array(
+			'not our variation'  => array( 'groupByYear' => true ),
+			'grouping off'       => array(
+				'yearsBack'   => 5,
+				'groupByYear' => false,
+			),
+			'not sorted by date' => array(
+				'yearsBack'   => 5,
+				'groupByYear' => true,
+				'orderBy'     => 'title',
+			),
+		);
+
+		foreach ( $cases as $label => $query ) {
+			$block->context = array( 'query' => $query );
+			$this->assertSame( $content, ( new Block() )->maybe_inject_year_headings( $content, array(), $block ), $label );
+		}
+	}
 }

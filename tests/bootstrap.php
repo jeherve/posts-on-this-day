@@ -72,3 +72,22 @@ if ( ! class_exists( 'WP_REST_Request' ) ) {
 		}
 	}
 }
+
+/**
+ * Minimal WP_Block stub for tests, for methods type-hinted with \WP_Block.
+ */
+if ( ! class_exists( 'WP_Block' ) ) {
+	// phpcs:disable Generic.Files.OneObjectStructurePerFile.MultipleFound
+	/**
+	 * Minimal WP_Block stub for testing.
+	 */
+	class WP_Block {
+		/**
+		 * Block context values.
+		 *
+		 * @var array
+		 */
+		public $context = array();
+	}
+	// phpcs:enable
+}
