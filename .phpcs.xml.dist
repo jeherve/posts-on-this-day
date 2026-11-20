@@ -8,7 +8,9 @@
 
 	<rule ref="WordPress.WP.I18n">
 		<properties>
-			<property name="text_domain" type="array" value="posts-on-this-day" />
+			<property name="text_domain" type="array">
+				<element value="posts-on-this-day" />
+			</property>
 		</properties>
 	</rule>
 
