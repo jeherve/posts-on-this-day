@@ -80,8 +80,8 @@ registerBlockVariation( 'core/query', {
 				[
 					'core/post-date',
 					{
-						// Without this binding, WordPress 6.9+ treats a new Date block
-						// as a custom date and shows today's date in the editor.
+						// Without this binding, a new Date block is a custom date
+						// and shows today's date in the editor.
 						metadata: {
 							bindings: {
 								datetime: {
@@ -179,7 +179,6 @@ function PostsOnThisDayControls( { query, setQuery } ) {
 		<InspectorControls>
 			<PanelBody title={ __( 'Posts On This Day', 'posts-on-this-day' ) }>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __(
 						'Include every past year',
 						'posts-on-this-day'
@@ -200,7 +199,6 @@ function PostsOnThisDayControls( { query, setQuery } ) {
 				{ ! allYears && (
 					<RangeControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={ __(
 							'Number of years to look back',
 							'posts-on-this-day'
@@ -222,7 +220,6 @@ function PostsOnThisDayControls( { query, setQuery } ) {
 					/>
 				) }
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Only this exact day', 'posts-on-this-day' ) }
 					help={
 						query.exactMatch
@@ -239,7 +236,6 @@ function PostsOnThisDayControls( { query, setQuery } ) {
 					onChange={ ( value ) => setQuery( { exactMatch: value } ) }
 				/>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Group posts by year', 'posts-on-this-day' ) }
 					help={ groupHelp }
 					checked={ sortedByDate && !! query.groupByYear }
@@ -249,7 +245,6 @@ function PostsOnThisDayControls( { query, setQuery } ) {
 				{ sortedByDate && !! query.groupByYear && (
 					<SelectControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={ __(
 							'Year heading level',
 							'posts-on-this-day'

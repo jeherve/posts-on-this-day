@@ -8,7 +8,7 @@
  * Author URI: https://jeremy.hu
  * License: GPL2+
  * Text Domain: posts-on-this-day
- * Requires at least: 6.6
+ * Requires at least: 7.0
  * Requires PHP: 8.3
  *
  * @package jeherve/posts-on-this-day

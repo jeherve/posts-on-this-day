@@ -2,7 +2,7 @@
 Contributors: jeherve
 Tags: widget, block, on this day
 Stable tag: 2.0.0
-Requires at least: 6.6
+Requires at least: 7.0
 Requires PHP: 8.3
 Tested up to: 7.1
 License: GPLv2 or later
@@ -67,7 +67,7 @@ You have 3 ways to do so.
 * New: "Posts On This Day" is now available as a block for use in the block editor and block-based themes. It can look back over every year since your first post, and group posts under year headings.
 * Query: posts published on this very day in past years now appear when looking for posts within a week. They used to be left out.
 * Query: on 29 February, years without a leap day show posts from 28 February. On 28 February, posts from 29 February in past leap years show too.
-* General: the plugin now requires WordPress 6.6 or later.
+* General: the plugin now requires WordPress 7.0 or later.
 
 ### [1.5.7] - 2026-02-27
 
@@ -132,4 +132,4 @@ You have 3 ways to do so.
 == Upgrade Notice ==
 
 = 2.0.0 =
-Adds a "Posts On This Day" block for the block editor and block themes. Requires WordPress 6.6 or later.
+Adds a "Posts On This Day" block for the block editor and block themes. Requires WordPress 7.0 or later.
