@@ -8,6 +8,7 @@
 namespace Jeherve\Posts_On_This_Day;
 
 use Brain\Monkey;
+use Brain\Monkey\Filters;
 use Brain\Monkey\Functions;
 use DateTimeZone;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -247,5 +248,75 @@ class QueryTest extends TestCase {
 	 */
 	public function test_build_date_query_with_no_years(): void {
 		$this->assertSame( array( 'relation' => 'OR' ), $this->date_query_from( '2026-11-20', 0, false ) );
+	}
+
+	/**
+	 * The years-back filter can return a string, a float or nothing; the widget must still get a whole number.
+	 *
+	 * Query::build_date_query() takes an int in a strict_types file, so passing the
+	 * filtered value through unchanged would be a fatal TypeError on the widget's page.
+	 *
+	 * @param mixed $filtered Value returned by the filter.
+	 * @param int   $expected Years back the widget uses.
+	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider( 'years_back_filter_values' )]
+	public function test_get_years_back_accepts_any_filter_value( $filtered, int $expected ): void {
+		Filters\expectApplied( 'jeherve_posts_on_this_day_query_back' )
+			->once()
+			->with( 10 )
+			->andReturn( $filtered );
+
+		$this->assertSame( $expected, Query::get_years_back( array( 'back' => 10 ) ) );
+	}
+
+	/**
+	 * Filter return values and the years back they should give.
+	 *
+	 * @return array<string, array{0: mixed, 1: int}>
+	 */
+	public static function years_back_filter_values(): array {
+		return array(
+			'numeric string' => array( '15', 15 ),
+			'float'          => array( 15.0, 15 ),
+			'int'            => array( 15, 15 ),
+			'null'           => array( null, 1 ),
+			'zero'           => array( 0, 1 ),
+			'negative'       => array( -3, 1 ),
+		);
+	}
+
+	/**
+	 * The widget defaults to 10 years back when none is saved.
+	 */
+	public function test_get_years_back_defaults_to_ten(): void {
+		$this->assertSame( 10, Query::get_years_back( array() ) );
+	}
+
+	/**
+	 * The widget's query must not pull in sticky posts from outside the date window.
+	 */
+	public function test_get_query_args_ignores_sticky_posts(): void {
+		$date_query = array(
+			array(
+				'after'     => '2020-11-14',
+				'before'    => '2020-11-20',
+				'inclusive' => true,
+			),
+			'relation' => 'OR',
+		);
+
+		$args = Query::get_query_args(
+			$date_query,
+			array(
+				'post_types' => array( 'post' ),
+				'max'        => 10,
+			)
+		);
+
+		$this->assertTrue( $args['ignore_sticky_posts'] );
+		$this->assertSame( $date_query, $args['date_query'] );
+		$this->assertSame( 10, $args['posts_per_page'] );
+		$this->assertSame( 'publish', $args['post_status'] );
+		$this->assertFalse( $args['has_password'] );
 	}
 }

@@ -30,21 +30,10 @@ class Query {
 		$posts = array();
 
 		$max         = ! empty( $instance['max'] ) ? (int) $instance['max'] : 10; // How many posts do we want maximum?
-		$back        = ! empty( $instance['back'] ) ? (int) $instance['back'] : 10; // How many years back to we want to go back?
 		$types       = implode( '-', $instance['post_types'] );
 		$exact_match = ! empty( $instance['exact_match'] ) ? (bool) $instance['exact_match'] : false;
 
-		/**
-		 * Filter the amount of years back to fetch posts from.
-		 *
-		 * Careful though; that can make for some really expensive queries,
-		 * so could slow the first loading of the page where the widget is displayed once a day.
-		 *
-		 * @since 1.2.0
-		 *
-		 * @param int $back Amount of years back to fetch posts from.
-		 */
-		$back = apply_filters( 'jeherve_posts_on_this_day_query_back', $back );
+		$back = self::get_years_back( $instance );
 
 		/*
 		 * Let's attempt to cache data for a day
@@ -73,6 +62,34 @@ class Query {
 		set_transient( $transient_key, $posts, self::get_seconds_left_in_day() );
 
 		return $posts;
+	}
+
+	/**
+	 * How many years back the widget looks.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param array $instance Saved widget options.
+	 *
+	 * @return int At least 1.
+	 */
+	public static function get_years_back( array $instance ): int {
+		$back = ! empty( $instance['back'] ) ? (int) $instance['back'] : 10;
+
+		/**
+		 * Filter the amount of years back to fetch posts from.
+		 *
+		 * Careful though; that can make for some really expensive queries,
+		 * so could slow the first loading of the page where the widget is displayed once a day.
+		 *
+		 * @since 1.2.0
+		 *
+		 * @param int $back Amount of years back to fetch posts from.
+		 */
+		$back = apply_filters( 'jeherve_posts_on_this_day_query_back', $back );
+
+		// Callbacks can return strings (from get_option(), say) or floats; keep a whole number of at least one year.
+		return max( 1, (int) $back );
 	}
 
 	/**
@@ -191,6 +208,30 @@ class Query {
 	}
 
 	/**
+	 * WP_Query arguments for the widget's posts.
+	 *
+	 * Sticky posts are not pulled to the top: WordPress would otherwise add every sticky
+	 * post to the results whatever its date, and go past the widget's maximum.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param array $date_query WP Query date query arguments.
+	 * @param array $instance   Saved widget options.
+	 *
+	 * @return array
+	 */
+	public static function get_query_args( array $date_query, array $instance ): array {
+		return array(
+			'post_type'           => $instance['post_types'],
+			'posts_per_page'      => $instance['max'],
+			'date_query'          => $date_query,
+			'has_password'        => false,
+			'post_status'         => 'publish',
+			'ignore_sticky_posts' => true,
+		);
+	}
+
+	/**
 	 * Query for posts matching our date query.
 	 *
 	 * @param array $date_query WP Query date query arguments.
@@ -201,13 +242,7 @@ class Query {
 	private function query_posts( array $date_query, array $instance ): array {
 		$posts = array();
 
-		$args = array(
-			'post_type'      => $instance['post_types'],
-			'posts_per_page' => $instance['max'],
-			'date_query'     => $date_query,
-			'has_password'   => false,
-			'post_status'    => 'publish',
-		);
+		$args = self::get_query_args( $date_query, $instance );
 
 		/**
 		 * Allow adjusting the query for a subset of posts.
