@@ -5,9 +5,43 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: read
+
 jobs:
+  # build/ is not committed, so the block editor script is built here and handed to the
+  # deploy job as an artifact. npm packages run in this job, which has no access to the
+  # WordPress.org credentials.
+  build:
+    name: Build block editor script
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        persist-credentials: false
+
+    - name: Setup Node
+      uses: actions/setup-node@v6
+      with:
+        node-version: lts/*
+        cache: npm
+
+    - name: Build
+      run: |
+        npm ci
+        npm run build
+
+    - name: Upload build
+      uses: actions/upload-artifact@v7
+      with:
+        name: block-editor-build
+        path: build/
+        if-no-files-found: error
+        retention-days: 1
+
   tag:
     name: Deploy new tag to WordPress.org
+    needs: build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
@@ -24,17 +58,11 @@ jobs:
       run: |
         composer install --no-dev
 
-    # build/ is not committed; the block editor script must be built before deploying.
-    - name: Setup Node
-      uses: actions/setup-node@v6
+    - name: Download build
+      uses: actions/download-artifact@v8
       with:
-        node-version: lts/*
-        cache: npm
-
-    - name: Build block editor script
-      run: |
-        npm ci
-        npm run build
+        name: block-editor-build
+        path: build/
 
     - name: WordPress Plugin Deploy
       uses: 10up/action-wordpress-plugin-deploy@stable
