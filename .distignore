@@ -12,3 +12,8 @@
 phpunit.xml.dist
 .editorconfig
 composer.lock
+
+node_modules/
+src/block/
+package.json
+package-lock.json

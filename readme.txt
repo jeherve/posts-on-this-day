@@ -1,27 +1,29 @@
 === Posts On This Day ===
 Contributors: jeherve
-Tags: widget, on this day
-Stable tag: 1.5.7
-Requires at least: 5.6
+Tags: widget, block, on this day
+Stable tag: 2.0.0
+Requires at least: 7.0
 Requires PHP: 8.3
-Tested up to: 6.9
+Tested up to: 7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Widget to display a list of posts published "on this day" in years past. A good little bit of nostalgia for your blog.
+Display a list of posts published "on this day" in years past. A good little bit of nostalgia for your blog.
 
 == Description ==
 
-If you're familiar with services like Google Photos, TimeHop, or even Facebook Memories, you most likely enjoyed getting little reminders of what happened in your life in years past. This little widget brings this feature to your site.
+If you're familiar with services like Google Photos, TimeHop, or even Facebook Memories, you most likely enjoyed getting little reminders of what happened in your life in years past. This plugin brings this feature to your site.
 
-This widget, just like Google Photos does, will give you a list of posts that were published at around this time (within a week) in the past years. You can choose:
+Just like Google Photos does, it will give you a list of posts that were published at around this time (within a week) in the past years. It is available as a block for the block editor and block-based themes, as well as a legacy widget. You can choose:
 
-* how many years back it should go.
+* how many years back it should go, or every year since your first post.
 * how many posts should be displayed at maximum.
 * what post types to pick old posts from.
 * whether you'd like to display thumbnails for those posts.
 * whether you'd like to group your posts by year.
 * whether you'd like to look for posts on the exact day, years past, or around this time (within a week).
+
+The block is a variation of the Query Loop block, so you can lay out each post however you like: featured image, title, date, excerpt, as a list or a grid.
 
 
 Banner image: [@rirri01](https://unsplash.com/@rirri01)
@@ -29,9 +31,22 @@ Banner image: [@rirri01](https://unsplash.com/@rirri01)
 == Installation ==
 
 * The usual. Go to Plugins > Add New, search, and install.
-* You can then go to Appearance > Widgets or Appearance > Customize to set up your widget in one of your widget areas.
+* **Block editor**: Add the "Posts On This Day" block to any page or template. You'll find it in the block inserter; searching for "on this day" or "memories" works too. Its settings are in the block sidebar, under "Posts On This Day".
+* **Legacy widget**: Go to Appearance > Widgets or Appearance > Customize to set up the widget in one of your widget areas.
 
 == FAQ ==
+
+= How do I change what the block shows for each post? =
+
+The block works like a Query Loop block. Select the post inside it to add, remove or move blocks such as the featured image, title, date or excerpt, and use the block's layout and style settings to switch between a list and a grid.
+
+= I turned on "Group posts by year", but I do not see year headings in the editor =
+
+The headings are added when the page is displayed on your site; the editor preview shows the posts without them. Year headings are only available when posts are ordered by date.
+
+= Can I change the block's query with code? =
+
+Yes. The block uses WordPress' `query_loop_block_query_vars` filter for its query, so you can hook into that filter too. Blocks from this plugin are the ones whose query has a `yearsBack` key. The `jeherve_posts_on_this_day_*` filters only apply to the legacy widget.
 
 = I want to customize the look of my widget =
 
@@ -46,6 +61,13 @@ You have 3 ways to do so.
 1. Widget settings
 
 == Changelog ==
+
+### [2.0.0] - 2026-02-27
+
+* New: "Posts On This Day" is now available as a block for use in the block editor and block-based themes. It can look back over every year since your first post, and group posts under year headings.
+* Query: posts published on this very day in past years now appear when looking for posts within a week. They used to be left out.
+* Query: on 29 February, years without a leap day show posts from 28 February. On 28 February, posts from 29 February in past leap years show too.
+* General: the plugin now requires WordPress 7.0 or later.
 
 ### [1.5.7] - 2026-02-27
 
@@ -107,3 +129,7 @@ You have 3 ways to do so.
 
 * Initial public release.
 
+== Upgrade Notice ==
+
+= 2.0.0 =
+Adds a "Posts On This Day" block for the block editor and block themes. Requires WordPress 7.0 or later.

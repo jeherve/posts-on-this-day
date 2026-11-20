@@ -13,7 +13,7 @@
 	},
 	"require-dev": {
 		"brain/monkey": "^2.6",
-		"automattic/jetpack-codesniffer": "7.0.0",
+		"automattic/jetpack-codesniffer": "10.0.0",
 		"dealerdirect/phpcodesniffer-composer-installer": "*",
 		"php-parallel-lint/php-parallel-lint": "1.4.0",
 		"phpunit/phpunit": "^12.0"
@@ -37,7 +37,6 @@
 			"@phpcs:lint --runtime-set ignore_warnings_on_exit 1"
 		],
 		"phpunit": [
-			"@composer update",
 			"./vendor/phpunit/phpunit/phpunit --colors=always"
 		],
 		"test-php": [
@@ -52,6 +51,9 @@
 	"minimum-stability": "stable",
 	"prefer-stable": true,
 	"config": {
+		"platform": {
+			"php": "8.3.0"
+		},
 		"allow-plugins": {
 			"automattic/jetpack-autoloader": true,
 			"roots/wordpress-core-installer": true,

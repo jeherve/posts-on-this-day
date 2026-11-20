@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <ruleset>
-	<config name="minimum_supported_wp_version" value="5.6" />
+	<config name="minimum_supported_wp_version" value="7.0" />
 	<config name="testVersion" value="8.3-"/>
 
 	<!-- Default ruleset. -->
@@ -8,7 +8,9 @@
 
 	<rule ref="WordPress.WP.I18n">
 		<properties>
-			<property name="text_domain" type="array" value="posts-on-this-day" />
+			<property name="text_domain" type="array">
+				<element value="posts-on-this-day" />
+			</property>
 		</properties>
 	</rule>
 
@@ -48,7 +50,8 @@
 	<!-- Ignore git, in case someone created a branch ending in ".php" or something -->
 	<exclude-pattern>/.git/*</exclude-pattern>
 
-	<!-- Ignore external libraries -->
+	<!-- Ignore external libraries and build artifacts -->
+	<exclude-pattern>/build/*</exclude-pattern>
 	<exclude-pattern>/node_modules/*</exclude-pattern>
 	<exclude-pattern>/vendor/*</exclude-pattern>
 	<exclude-pattern>/wordpress/*</exclude-pattern>

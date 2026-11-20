@@ -8,6 +8,7 @@
 namespace Jeherve\Posts_On_This_Day;
 
 use Brain\Monkey;
+use Brain\Monkey\Filters;
 use Brain\Monkey\Functions;
 use DateTimeZone;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -106,5 +107,216 @@ class QueryTest extends TestCase {
 		$expected = ( new \DateTime( 'now', $tz ) )->format( 'Y-m-d' );
 
 		$this->assertSame( $expected, $result );
+	}
+
+	/**
+	 * Build a date query from a fixed day, in UTC.
+	 *
+	 * @param string $today       Day to look back from, Y-m-d.
+	 * @param int    $years_back  Years to look back.
+	 * @param bool   $exact_match Exact day or week window.
+	 *
+	 * @return array
+	 */
+	private function date_query_from( string $today, int $years_back, bool $exact_match ): array {
+		return Query::build_date_query(
+			$years_back,
+			$exact_match,
+			new \DateTimeImmutable( $today . ' 15:30:00', new DateTimeZone( 'UTC' ) )
+		);
+	}
+
+	/**
+	 * The week window covers the 7 days ending on today's date, today included.
+	 *
+	 * Regression test: the window used to stop the day before, so posts published
+	 * on this exact day in past years were left out.
+	 */
+	public function test_build_date_query_week_window_includes_today(): void {
+		$result = $this->date_query_from( '2026-11-20', 2, false );
+
+		$this->assertSame(
+			array(
+				array(
+					'after'     => '2025-11-14',
+					'before'    => '2025-11-20',
+					'inclusive' => true,
+				),
+				array(
+					'after'     => '2024-11-14',
+					'before'    => '2024-11-20',
+					'inclusive' => true,
+				),
+				'relation' => 'OR',
+			),
+			$result
+		);
+	}
+
+	/**
+	 * Exact matching uses a single inclusive day per year.
+	 */
+	public function test_build_date_query_exact_match(): void {
+		$result = $this->date_query_from( '2026-11-20', 3, true );
+
+		$this->assertCount( 4, $result );
+		$this->assertSame( 'OR', $result['relation'] );
+		$this->assertSame(
+			array(
+				'after'     => '2023-11-20',
+				'before'    => '2023-11-20',
+				'inclusive' => true,
+			),
+			$result[2]
+		);
+	}
+
+	/**
+	 * The current year is never part of the query.
+	 */
+	public function test_build_date_query_excludes_current_year(): void {
+		$result = $this->date_query_from( '2026-01-03', 5, false );
+
+		foreach ( array_filter( $result, 'is_array' ) as $range ) {
+			$this->assertLessThan( '2026-01-01', $range['before'] );
+		}
+	}
+
+	/**
+	 * Early in January, the week window reaches back into December of the previous year.
+	 */
+	public function test_build_date_query_week_window_crosses_year_boundary(): void {
+		$result = $this->date_query_from( '2026-01-03', 1, false );
+
+		$this->assertSame( '2024-12-28', $result[0]['after'] );
+		$this->assertSame( '2025-01-03', $result[0]['before'] );
+	}
+
+	/**
+	 * On 29 February, years without a leap day fall back to 28 February.
+	 *
+	 * Regression test: DateTime arithmetic used to turn 29 February into 1 March.
+	 */
+	public function test_build_date_query_leap_day_in_non_leap_years(): void {
+		$result = $this->date_query_from( '2028-02-29', 4, true );
+
+		$this->assertSame( array( '2027-02-28', '2027-02-28' ), array( $result[0]['after'], $result[0]['before'] ) );
+		$this->assertSame( array( '2026-02-28', '2026-02-28' ), array( $result[1]['after'], $result[1]['before'] ) );
+		$this->assertSame( array( '2024-02-29', '2024-02-29' ), array( $result[3]['after'], $result[3]['before'] ) );
+	}
+
+	/**
+	 * On 28 February of a non-leap year, leap years also include 29 February.
+	 */
+	public function test_build_date_query_includes_leap_day_on_28_february(): void {
+		$result = $this->date_query_from( '2027-02-28', 3, true );
+
+		// 2026 and 2025 have no leap day; 2024 does.
+		$this->assertSame( '2026-02-28', $result[0]['before'] );
+		$this->assertSame( '2025-02-28', $result[1]['before'] );
+		$this->assertSame( '2024-02-28', $result[2]['after'] );
+		$this->assertSame( '2024-02-29', $result[2]['before'] );
+	}
+
+	/**
+	 * In a leap year, 28 February is just 28 February.
+	 */
+	public function test_build_date_query_28_february_in_leap_year(): void {
+		$result = $this->date_query_from( '2028-02-28', 4, true );
+
+		$this->assertSame( '2024-02-28', $result[3]['before'] );
+	}
+
+	/**
+	 * Without an explicit day, "today" is computed in the site's timezone.
+	 */
+	public function test_build_date_query_defaults_to_today_in_site_timezone(): void {
+		$tz = new DateTimeZone( 'Pacific/Auckland' );
+		Functions\when( 'wp_timezone' )->justReturn( $tz );
+
+		$result = Query::build_date_query( 1, true );
+
+		$now = new \DateTimeImmutable( 'now', $tz );
+		$this->assertStringStartsWith(
+			sprintf( '%d-%s-', (int) $now->format( 'Y' ) - 1, $now->format( 'm' ) ),
+			$result[0]['before']
+		);
+	}
+
+	/**
+	 * Zero or negative years produce no date range at all.
+	 */
+	public function test_build_date_query_with_no_years(): void {
+		$this->assertSame( array( 'relation' => 'OR' ), $this->date_query_from( '2026-11-20', 0, false ) );
+	}
+
+	/**
+	 * The years-back filter can return a string, a float or nothing; the widget must still get a whole number.
+	 *
+	 * Query::build_date_query() takes an int in a strict_types file, so passing the
+	 * filtered value through unchanged would be a fatal TypeError on the widget's page.
+	 *
+	 * @param mixed $filtered Value returned by the filter.
+	 * @param int   $expected Years back the widget uses.
+	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider( 'years_back_filter_values' )]
+	public function test_get_years_back_accepts_any_filter_value( $filtered, int $expected ): void {
+		Filters\expectApplied( 'jeherve_posts_on_this_day_query_back' )
+			->once()
+			->with( 10 )
+			->andReturn( $filtered );
+
+		$this->assertSame( $expected, Query::get_years_back( array( 'back' => 10 ) ) );
+	}
+
+	/**
+	 * Filter return values and the years back they should give.
+	 *
+	 * @return array<string, array{0: mixed, 1: int}>
+	 */
+	public static function years_back_filter_values(): array {
+		return array(
+			'numeric string' => array( '15', 15 ),
+			'float'          => array( 15.0, 15 ),
+			'int'            => array( 15, 15 ),
+			'null'           => array( null, 1 ),
+			'zero'           => array( 0, 1 ),
+			'negative'       => array( -3, 1 ),
+		);
+	}
+
+	/**
+	 * The widget defaults to 10 years back when none is saved.
+	 */
+	public function test_get_years_back_defaults_to_ten(): void {
+		$this->assertSame( 10, Query::get_years_back( array() ) );
+	}
+
+	/**
+	 * The widget's query must not pull in sticky posts from outside the date window.
+	 */
+	public function test_get_query_args_ignores_sticky_posts(): void {
+		$date_query = array(
+			array(
+				'after'     => '2020-11-14',
+				'before'    => '2020-11-20',
+				'inclusive' => true,
+			),
+			'relation' => 'OR',
+		);
+
+		$args = Query::get_query_args(
+			$date_query,
+			array(
+				'post_types' => array( 'post' ),
+				'max'        => 10,
+			)
+		);
+
+		$this->assertTrue( $args['ignore_sticky_posts'] );
+		$this->assertSame( $date_query, $args['date_query'] );
+		$this->assertSame( 10, $args['posts_per_page'] );
+		$this->assertSame( 'publish', $args['post_status'] );
+		$this->assertFalse( $args['has_password'] );
 	}
 }

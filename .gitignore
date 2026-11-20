@@ -4,6 +4,10 @@ wordpress/
 .github/actions/triage/dist/
 .github/actions/triage/node_modules/
 
+# Node/Build
+node_modules/
+build/
+
 # Files
 .phpunit.cache/
 .phpunit.result.cache

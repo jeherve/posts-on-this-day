@@ -1,4 +1,18 @@
 {
-	"extends": ["config:base"],
-	"labels": ["[Type] Janitorial", "Deps"]
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": ["config:recommended"],
+	"labels": ["[Type] Janitorial", "Deps"],
+	"packageRules": [
+		{
+			"description": "Update the block editor packages together.",
+			"matchPackageNames": ["/^@wordpress\\//"],
+			"groupName": "WordPress packages",
+			"groupSlug": "wordpress-packages"
+		},
+		{
+			"description": "PHPUnit 13 requires PHP 8.4, and the plugin still supports PHP 8.3. Lift this when PHP 8.3 support is dropped.",
+			"matchPackageNames": ["phpunit/phpunit"],
+			"allowedVersions": "<13"
+		}
+	]
 }
