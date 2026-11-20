@@ -1,6 +1,6 @@
-const { setFailed, getInput, debug } = require( '@actions/core' );
-const { context, getOctokit } = require( '@actions/github' );
-const triagePrToProject = require( './triage-pr-to-project' );
+import { setFailed, getInput, debug } from '@actions/core';
+import { context, getOctokit } from '@actions/github';
+import triagePrToProject from './triage-pr-to-project.js';
 
 /**
  * Determine the priority of the issue based on severity and workarounds info from the issue contents.
