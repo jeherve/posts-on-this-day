@@ -10,6 +10,11 @@
 			"groupSlug": "wordpress-packages"
 		},
 		{
+			"description": "The editor uses the copies of these packages that WordPress ships, so build against the versions in the oldest supported release. Move this tag when the plugin's minimum WordPress version changes.",
+			"matchPackageNames": ["/^@wordpress\\//", "!@wordpress/scripts"],
+			"followTag": "wp-7.0"
+		},
+		{
 			"description": "PHPUnit 13 requires PHP 8.4, and the plugin still supports PHP 8.3. Lift this when PHP 8.3 support is dropped.",
 			"matchPackageNames": ["phpunit/phpunit"],
 			"allowedVersions": "<13"

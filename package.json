@@ -11,17 +11,21 @@
 		"format": "wp-scripts format src/block/"
 	},
 	"devDependencies": {
-		"@wordpress/scripts": "31.5.0"
+		"@wordpress/scripts": "37.2.0"
 	},
 	"dependencies": {
-		"@wordpress/block-editor": "15.13.1",
-		"@wordpress/blocks": "15.13.0",
-		"@wordpress/components": "32.2.0",
-		"@wordpress/compose": "7.40.0",
-		"@wordpress/core-data": "7.40.0",
-		"@wordpress/data": "10.40.0",
-		"@wordpress/element": "6.40.0",
-		"@wordpress/hooks": "4.40.0",
-		"@wordpress/i18n": "6.13.0"
+		"@wordpress/block-editor": "15.13.2",
+		"@wordpress/blocks": "15.13.1",
+		"@wordpress/components": "32.2.1",
+		"@wordpress/compose": "7.40.1",
+		"@wordpress/core-data": "7.40.2",
+		"@wordpress/data": "10.40.1",
+		"@wordpress/element": "6.40.1",
+		"@wordpress/hooks": "4.40.1",
+		"@wordpress/i18n": "6.13.1"
+	},
+	"overrides": {
+		"serialize-javascript": "^7.1.4",
+		"uuid": "^14.0.3"
 	}
 }
