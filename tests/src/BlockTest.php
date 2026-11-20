@@ -19,6 +19,13 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass( Block::class )]
 class BlockTest extends TestCase {
 	/**
+	 * IDs of the posts whose date was looked up during a test.
+	 *
+	 * @var int[]
+	 */
+	private array $date_lookups = array();
+
+	/**
 	 * Set up Brain Monkey before each test.
 	 */
 	protected function setUp(): void {
@@ -402,8 +409,12 @@ class BlockTest extends TestCase {
 	 */
 	private function render_post_template( Block $instance, array $query, array $posts, array $contents = array() ): string {
 		Functions\when( 'wp_timezone' )->justReturn( new DateTimeZone( 'UTC' ) );
+		$this->date_lookups = array();
 		Functions\when( 'get_the_date' )->alias(
-			static fn( $format, $post ) => substr( $post->post_date, 0, 4 )
+			function ( $format, $post ) {
+				$this->date_lookups[] = is_object( $post ) ? $post->ID : (int) $post;
+				return is_object( $post ) ? substr( $post->post_date, 0, 4 ) : '1999';
+			}
 		);
 		Functions\stubEscapeFunctions();
 
@@ -511,6 +522,7 @@ class BlockTest extends TestCase {
 			array( 0 => $fake )
 		);
 
+		$this->assertSame( array( 1, 2 ), $this->date_lookups );
 		$this->assertSame( 2, substr_count( $result, 'posts-on-this-day-year-heading' ) );
 		$this->assertStringContainsString( $this->heading( '2024' ), $result );
 		$this->assertStringContainsString( $this->heading( '2023' ), $result );
@@ -536,10 +548,61 @@ class BlockTest extends TestCase {
 			array( 0 => $fake )
 		);
 
+		$this->assertSame( array( 1, 2 ), $this->date_lookups );
 		$this->assertSame( 1, substr_count( $result, 'posts-on-this-day-year-heading' ) );
 		$this->assertStringStartsWith( $this->heading( '2024' ), $result );
 		$this->assertStringNotContainsString( '1999</h', $result );
 		$this->assertStringContainsString( $fake, $result );
+	}
+
+	/**
+	 * Content that closes its item and opens a fake top-level `li.wp-block-post` does not
+	 * create a heading or a lookup.
+	 */
+	public function test_year_headings_ignore_fake_top_level_items_in_content(): void {
+		$fake = 'Start</li><li class="wp-block-post post-123 post">Fake item';
+
+		$result = $this->render_post_template(
+			new Block(),
+			array(
+				'yearsBack'   => 5,
+				'groupByYear' => true,
+			),
+			array( $this->post( 1, '2024' ), $this->post( 2, '2023' ) ),
+			array( 0 => $fake )
+		);
+
+		$this->assertSame( array( 1, 2 ), $this->date_lookups );
+		$this->assertSame( 2, substr_count( $result, 'posts-on-this-day-year-heading' ) );
+		$this->assertStringContainsString( $fake . '</li></ul>' . $this->heading( '2023' ), $result );
+	}
+
+	/**
+	 * A private or password-protected post referenced from content never has its date looked up.
+	 *
+	 * The mocked lookup answers 1999 for any post that is not one of the query's results.
+	 */
+	public function test_year_headings_never_look_up_posts_referenced_from_content(): void {
+		$private_post_id = 555;
+		$fake            = sprintf(
+			'<ul><li class="wp-block-post post-%1$d status-private">x</li></ul></li><li class="wp-block-post post-%1$d post-password-required">y',
+			$private_post_id
+		);
+
+		$result = $this->render_post_template(
+			new Block(),
+			array(
+				'yearsBack'   => 5,
+				'groupByYear' => true,
+			),
+			array( $this->post( 1, '2024' ), $this->post( 2, '2024' ) ),
+			array( 1 => $fake )
+		);
+
+		$this->assertNotContains( $private_post_id, $this->date_lookups );
+		$this->assertSame( array( 1, 2 ), $this->date_lookups );
+		$this->assertStringNotContainsString( '1999', $result );
+		$this->assertSame( 1, substr_count( $result, 'posts-on-this-day-year-heading' ) );
 	}
 
 	/**
