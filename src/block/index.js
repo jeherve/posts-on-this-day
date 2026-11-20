@@ -192,7 +192,7 @@ function PostsOnThisDayControls( { query, setQuery } ) {
 								: Math.min(
 										DEFAULT_YEARS_BACK,
 										yearsOfHistory ?? DEFAULT_YEARS_BACK
-								  ),
+									),
 						} )
 					}
 				/>
@@ -226,11 +226,11 @@ function PostsOnThisDayControls( { query, setQuery } ) {
 							? __(
 									'Shows posts published on this exact day in past years.',
 									'posts-on-this-day'
-							  )
+								)
 							: __(
 									'Shows posts published in the 7 days up to this day in past years.',
 									'posts-on-this-day'
-							  )
+								)
 					}
 					checked={ !! query.exactMatch }
 					onChange={ ( value ) => setQuery( { exactMatch: value } ) }

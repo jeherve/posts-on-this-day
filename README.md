@@ -31,6 +31,14 @@ Since the plugin lives in the WordPress.org plugin directory, you can [submit tr
 
 ## Screenshots
 
+### The block in the editor
+
+![The Posts On This Day block in the editor, with its settings](.wordpress-org/screenshot-2.png)
+
+### Posts grouped by year
+
+![Posts grouped by year on the site](.wordpress-org/screenshot-3.png)
+
 ### Widget Settings
 
 ![Widget Settings](.wordpress-org/screenshot-1.png)
@@ -46,4 +54,4 @@ And more. See `composer.json` to find out more.
 
 ## License
 
-Jetpack is licensed under [GNU General Public License v2 (or later)](./license.txt).
+Posts On This Day is licensed under [GNU General Public License v2 (or later)](./LICENSE.txt).

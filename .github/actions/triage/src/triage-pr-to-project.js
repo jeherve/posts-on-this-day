@@ -1,4 +1,4 @@
-const { setFailed, getInput, debug } = require( '@actions/core' );
+import { setFailed, getInput, debug } from '@actions/core';
 
 /* global WebhookPayloadPullRequest, GitHub */
 
@@ -228,4 +228,4 @@ async function triagePrToProject( payload, octokit ) {
 	return;
 }
 
-module.exports = triagePrToProject;
+export default triagePrToProject;
