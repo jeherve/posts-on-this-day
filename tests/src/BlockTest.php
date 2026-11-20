@@ -60,8 +60,10 @@ class BlockTest extends TestCase {
 		$this->assertTrue(
 			has_action( 'rest_api_init', array( $instance, 'register_rest_filters' ) ) !== false
 		);
-		$this->assertTrue(
-			has_filter( 'the_posts', array( $instance, 'capture_grouped_posts' ) ) !== false
+		$this->assertSame(
+			PHP_INT_MAX,
+			has_filter( 'the_posts', array( $instance, 'capture_grouped_posts' ) ),
+			'Years must be recorded after every other the_posts filter, so they match the rendered order.'
 		);
 		$this->assertTrue(
 			has_filter( 'render_block_core/null', array( $instance, 'mark_grouped_item' ) ) !== false

@@ -61,7 +61,8 @@ class Block {
 		add_filter( 'render_block_data', array( $this, 'force_custom_query' ) );
 		add_filter( 'query_loop_block_query_vars', array( $this, 'filter_query_vars' ), 10, 2 );
 		add_action( 'rest_api_init', array( $this, 'register_rest_filters' ) );
-		add_filter( 'the_posts', array( $this, 'capture_grouped_posts' ), 10, 2 );
+		// Last, so the recorded order is the one the posts are rendered in, after any plugin reorders them.
+		add_filter( 'the_posts', array( $this, 'capture_grouped_posts' ), PHP_INT_MAX, 2 );
 		add_filter( 'render_block_core/null', array( $this, 'mark_grouped_item' ), 10, 2 );
 		add_filter( 'render_block_core/post-template', array( $this, 'maybe_inject_year_headings' ), 10, 3 );
 	}
