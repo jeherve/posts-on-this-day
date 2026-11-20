@@ -17,6 +17,23 @@ use WP_Block;
  */
 class Block {
 	/**
+	 * Namespace identifying our variation of the Query Loop block.
+	 *
+	 * @var string
+	 */
+	const VARIATION = 'jeherve/posts-on-this-day';
+
+	/**
+	 * Upper bound for the number of years to look back.
+	 *
+	 * Each year adds a clause to the date query, and the value can come from a
+	 * public REST request, so it must stay bounded.
+	 *
+	 * @var int
+	 */
+	const MAX_YEARS_BACK = 100;
+
+	/**
 	 * Initialize hooks.
 	 *
 	 * @since 2.0.0
@@ -25,7 +42,7 @@ class Block {
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_editor_assets' ) );
 		add_filter( 'render_block_data', array( $this, 'force_custom_query' ) );
 		add_filter( 'query_loop_block_query_vars', array( $this, 'filter_query_vars' ), 10, 2 );
-		add_filter( 'rest_post_query', array( $this, 'filter_rest_query' ), 10, 2 );
+		add_action( 'rest_api_init', array( $this, 'register_rest_filters' ) );
 		add_filter( 'render_block_core/post-template', array( $this, 'maybe_inject_year_headings' ), 10, 3 );
 	}
 
@@ -45,7 +62,7 @@ class Block {
 	public function force_custom_query( array $parsed_block ): array {
 		if (
 			isset( $parsed_block['attrs']['namespace'] )
-			&& 'jeherve/posts-on-this-day' === $parsed_block['attrs']['namespace']
+			&& self::VARIATION === $parsed_block['attrs']['namespace']
 		) {
 			$parsed_block['attrs']['query']['inherit'] = false;
 		}
@@ -84,6 +101,9 @@ class Block {
 	/**
 	 * Filter the Query Loop block query vars to inject our custom date query.
 	 *
+	 * Core does not pass the block's namespace in context, so the `yearsBack`
+	 * key in the query is what identifies our variation.
+	 *
 	 * @since 2.0.0
 	 *
 	 * @param array    $query The query vars for the Query Loop block.
@@ -94,24 +114,32 @@ class Block {
 	public function filter_query_vars( array $query, $block ): array {
 		$block_query = $block->context['query'] ?? array();
 
-		if ( ! isset( $block_query['yearsBack'] ) ) {
+		if ( ! is_array( $block_query ) || ! array_key_exists( 'yearsBack', $block_query ) ) {
 			return $query;
 		}
 
-		$years_back  = (int) ( $block_query['yearsBack'] ?? 10 );
-		$exact_match = (bool) ( $block_query['exactMatch'] ?? false );
+		return self::add_query_args( $query, $block_query['yearsBack'], $block_query['exactMatch'] ?? false );
+	}
 
-		$query['date_query']   = Query::build_date_query( $years_back, $exact_match );
-		$query['has_password'] = false;
-
-		return $query;
+	/**
+	 * Hook the REST query filter for every post type exposed in the REST API.
+	 *
+	 * The editor preview fetches posts from the post type's own REST route,
+	 * and each route has its own `rest_{$post_type}_query` filter.
+	 *
+	 * @since 2.0.0
+	 */
+	public function register_rest_filters(): void {
+		foreach ( get_post_types( array( 'show_in_rest' => true ) ) as $post_type ) {
+			add_filter( "rest_{$post_type}_query", array( $this, 'filter_rest_query' ), 10, 2 );
+		}
 	}
 
 	/**
 	 * Filter the REST API query for editor preview.
 	 *
-	 * When the editor fetches posts for preview, check for our custom
-	 * parameters and inject the date query if present.
+	 * The Query Loop editor passes any extra query attributes as request
+	 * parameters, so `yearsBack` and `exactMatch` arrive as query strings.
 	 *
 	 * @since 2.0.0
 	 *
@@ -127,13 +155,53 @@ class Block {
 			return $args;
 		}
 
-		$exact_match = (bool) $request->get_param( 'exactMatch' );
-		$years_back  = (int) $years_back;
+		return self::add_query_args( $args, $years_back, $request->get_param( 'exactMatch' ) );
+	}
 
-		$args['date_query']   = Query::build_date_query( $years_back, $exact_match );
-		$args['has_password'] = false;
+	/**
+	 * Add our restrictions to a set of WP_Query arguments.
+	 *
+	 * Matches the widget: only published posts without a password, and sticky
+	 * posts are not pulled to the top regardless of their date.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param array $args        WP_Query arguments.
+	 * @param mixed $years_back  Years to look back; 0 means every year with posts.
+	 * @param mixed $exact_match Whether to only match the exact day. Accepts booleans and strings such as "false".
+	 *
+	 * @return array
+	 */
+	public static function add_query_args( array $args, $years_back, $exact_match ): array {
+		$args['date_query']          = Query::build_date_query(
+			self::sanitize_years_back( $years_back, $args['post_type'] ?? 'post' ),
+			filter_var( $exact_match, FILTER_VALIDATE_BOOLEAN )
+		);
+		$args['has_password']        = false;
+		$args['post_status']         = 'publish';
+		$args['ignore_sticky_posts'] = true;
 
 		return $args;
+	}
+
+	/**
+	 * Turn a `yearsBack` value into a number of years we can query.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param mixed           $years_back Raw value, from block attributes or a REST request.
+	 * @param string|string[] $post_type  Post type(s) being queried, used when looking back over every year.
+	 *
+	 * @return int Between 1 and MAX_YEARS_BACK.
+	 */
+	public static function sanitize_years_back( $years_back, $post_type ): int {
+		$years = is_numeric( $years_back ) ? (int) $years_back : 0;
+
+		if ( $years <= 0 ) {
+			$years = Query::get_years_of_history( $post_type );
+		}
+
+		return max( 1, min( self::MAX_YEARS_BACK, $years ) );
 	}
 
 	/**

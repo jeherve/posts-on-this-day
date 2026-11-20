@@ -138,6 +138,48 @@ class Query {
 	}
 
 	/**
+	 * Get how many years back the oldest published post of a post type goes.
+	 *
+	 * The lookup is a single indexed query, cached for the request; WP_Query's own
+	 * query cache also keeps it across requests when a persistent object cache is in use.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param string|string[] $post_type Post type(s) to look at.
+	 *
+	 * @return int Number of past years with possible posts, at least 1.
+	 */
+	public static function get_years_of_history( $post_type ): int {
+		static $years = array();
+
+		$key = implode( ',', (array) $post_type );
+		if ( isset( $years[ $key ] ) ) {
+			return $years[ $key ];
+		}
+
+		$oldest = get_posts(
+			array(
+				'post_type'              => $post_type,
+				'post_status'            => 'publish',
+				'posts_per_page'         => 1,
+				'orderby'                => 'date',
+				'order'                  => 'ASC',
+				'ignore_sticky_posts'    => true,
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+			)
+		);
+
+		$this_year   = (int) ( new DateTimeImmutable( 'now', wp_timezone() ) )->format( 'Y' );
+		$oldest_year = empty( $oldest ) ? $this_year : (int) substr( $oldest[0]->post_date, 0, 4 );
+
+		$years[ $key ] = max( 1, $this_year - $oldest_year );
+
+		return $years[ $key ];
+	}
+
+	/**
 	 * Whether a year has a 29 February.
 	 *
 	 * @param int $year Year.

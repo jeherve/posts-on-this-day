@@ -51,7 +51,7 @@ class BlockTest extends TestCase {
 			has_filter( 'query_loop_block_query_vars', array( $instance, 'filter_query_vars' ) ) !== false
 		);
 		$this->assertTrue(
-			has_filter( 'rest_post_query', array( $instance, 'filter_rest_query' ) ) !== false
+			has_action( 'rest_api_init', array( $instance, 'register_rest_filters' ) ) !== false
 		);
 		$this->assertTrue(
 			has_filter( 'render_block_core/post-template', array( $instance, 'maybe_inject_year_headings' ) ) !== false
@@ -97,24 +97,34 @@ class BlockTest extends TestCase {
 	}
 
 	/**
-	 * Test that filter_query_vars adds date_query when yearsBack is present.
+	 * Build a stand-in for a WP_Block with the given query context.
+	 *
+	 * @param array $query Query context.
+	 *
+	 * @return \stdClass
+	 */
+	private function block_with_query( array $query ): \stdClass {
+		$block          = new \stdClass();
+		$block->context = array( 'query' => $query );
+		return $block;
+	}
+
+	/**
+	 * Test that filter_query_vars adds our restrictions when yearsBack is present.
 	 */
 	public function test_filter_query_vars_adds_date_query(): void {
 		Functions\when( 'wp_timezone' )->justReturn( new DateTimeZone( 'UTC' ) );
 
-		$block          = new \stdClass();
-		$block->context = array(
-			'query' => array(
+		$block = $this->block_with_query(
+			array(
 				'yearsBack'  => 5,
 				'exactMatch' => false,
-			),
+			)
 		);
 
 		$instance = new Block();
 		$result   = $instance->filter_query_vars( array( 'post_type' => 'post' ), $block );
 
-		$this->assertArrayHasKey( 'date_query', $result );
-		$this->assertArrayHasKey( 'has_password', $result );
 		$this->assertFalse( $result['has_password'] );
 		$this->assertSame( 'OR', $result['date_query']['relation'] );
 		// 5 years back = 5 date ranges + relation.
@@ -122,48 +132,74 @@ class BlockTest extends TestCase {
 	}
 
 	/**
+	 * Private posts stay out of the block, even for logged-in users who can read them.
+	 *
+	 * Regression test: WP_Query adds private posts for users who can read them
+	 * when no status is set, which is what the Query Loop block does.
+	 */
+	public function test_filter_query_vars_only_queries_published_posts(): void {
+		Functions\when( 'wp_timezone' )->justReturn( new DateTimeZone( 'UTC' ) );
+
+		$result = ( new Block() )->filter_query_vars(
+			array( 'post_type' => 'post' ),
+			$this->block_with_query( array( 'yearsBack' => 2 ) )
+		);
+
+		$this->assertSame( 'publish', $result['post_status'] );
+	}
+
+	/**
+	 * Sticky posts are not pulled to the top of the list regardless of their date.
+	 *
+	 * Regression test: with the Query Loop default `sticky: ""`, WP_Query prepends
+	 * every sticky post to the first page.
+	 */
+	public function test_filter_query_vars_ignores_sticky_posts(): void {
+		Functions\when( 'wp_timezone' )->justReturn( new DateTimeZone( 'UTC' ) );
+
+		$result = ( new Block() )->filter_query_vars(
+			array( 'post_type' => 'post' ),
+			$this->block_with_query(
+				array(
+					'yearsBack' => 2,
+					'sticky'    => '',
+				)
+			)
+		);
+
+		$this->assertTrue( $result['ignore_sticky_posts'] );
+	}
+
+	/**
 	 * Test that filter_query_vars skips when yearsBack is absent.
 	 */
 	public function test_filter_query_vars_skips_without_years_back(): void {
-		$block          = new \stdClass();
-		$block->context = array(
-			'query' => array(
-				'postType' => 'post',
-			),
-		);
-
 		$instance = new Block();
 		$original = array( 'post_type' => 'post' );
-		$result   = $instance->filter_query_vars( $original, $block );
+		$result   = $instance->filter_query_vars( $original, $this->block_with_query( array( 'postType' => 'post' ) ) );
 
 		$this->assertSame( $original, $result );
 	}
 
 	/**
-	 * Test that filter_query_vars with exactMatch true produces inclusive date ranges.
+	 * Test that filter_query_vars with exactMatch true produces single-day ranges.
 	 */
 	public function test_filter_query_vars_with_exact_match(): void {
 		Functions\when( 'wp_timezone' )->justReturn( new DateTimeZone( 'UTC' ) );
 
-		$block          = new \stdClass();
-		$block->context = array(
-			'query' => array(
+		$block = $this->block_with_query(
+			array(
 				'yearsBack'  => 3,
 				'exactMatch' => true,
-			),
+			)
 		);
 
 		$instance = new Block();
 		$result   = $instance->filter_query_vars( array( 'post_type' => 'post' ), $block );
 
-		$this->assertArrayHasKey( 'date_query', $result );
-		$this->assertSame( 'OR', $result['date_query']['relation'] );
-		// 3 years back = 3 date ranges + relation.
 		$this->assertCount( 4, $result['date_query'] );
 
-		// Each date range should be inclusive with matching before/after dates.
 		for ( $i = 0; $i < 3; $i++ ) {
-			$this->assertArrayHasKey( 'inclusive', $result['date_query'][ $i ] );
 			$this->assertTrue( $result['date_query'][ $i ]['inclusive'] );
 			$this->assertSame( $result['date_query'][ $i ]['before'], $result['date_query'][ $i ]['after'] );
 		}
@@ -184,6 +220,59 @@ class BlockTest extends TestCase {
 	}
 
 	/**
+	 * A yearsBack of 0 looks back as far as the oldest published post.
+	 */
+	public function test_years_back_zero_covers_every_year_with_posts(): void {
+		Functions\when( 'wp_timezone' )->justReturn( new DateTimeZone( 'UTC' ) );
+		$oldest            = new \stdClass();
+		$oldest->post_date = '2005-03-14 10:00:00';
+		Functions\expect( 'get_posts' )->once()->andReturn( array( $oldest ) );
+
+		$years = Block::sanitize_years_back( 0, 'potd_history_test' );
+
+		$this->assertSame( (int) gmdate( 'Y' ) - 2005, $years );
+	}
+
+	/**
+	 * On a site with no older posts, "every year" still means at least one year.
+	 *
+	 * An empty set of ranges would leave the date query without any condition.
+	 */
+	public function test_years_back_zero_without_posts_is_one_year(): void {
+		Functions\when( 'wp_timezone' )->justReturn( new DateTimeZone( 'UTC' ) );
+		Functions\expect( 'get_posts' )->once()->andReturn( array() );
+
+		$this->assertSame( 1, Block::sanitize_years_back( '0', 'potd_empty_test' ) );
+	}
+
+	/**
+	 * Years back is capped, so a REST request cannot ask for an unbounded date query.
+	 */
+	public function test_years_back_is_capped(): void {
+		$this->assertSame( Block::MAX_YEARS_BACK, Block::sanitize_years_back( '1000000000', 'post' ) );
+		$this->assertSame( 25, Block::sanitize_years_back( 25, 'post' ) );
+		$this->assertSame( 7, Block::sanitize_years_back( '7', 'post' ) );
+	}
+
+	/**
+	 * Test that register_rest_filters hooks every REST-enabled post type.
+	 */
+	public function test_register_rest_filters_covers_all_rest_post_types(): void {
+		Functions\when( 'get_post_types' )->justReturn(
+			array(
+				'post' => 'post',
+				'page' => 'page',
+			)
+		);
+
+		$instance = new Block();
+		$instance->register_rest_filters();
+
+		$this->assertNotFalse( has_filter( 'rest_post_query', array( $instance, 'filter_rest_query' ) ) );
+		$this->assertNotFalse( has_filter( 'rest_page_query', array( $instance, 'filter_rest_query' ) ) );
+	}
+
+	/**
 	 * Test that filter_rest_query adds date_query when yearsBack param is present.
 	 */
 	public function test_filter_rest_query_with_years_back(): void {
@@ -191,17 +280,39 @@ class BlockTest extends TestCase {
 
 		$request = new \WP_REST_Request(
 			array(
-				'yearsBack'  => 3,
-				'exactMatch' => false,
+				'yearsBack'  => '3',
+				'exactMatch' => '0',
 			)
 		);
 
 		$instance = new Block();
 		$result   = $instance->filter_rest_query( array( 'post_type' => 'post' ), $request );
 
-		$this->assertArrayHasKey( 'date_query', $result );
+		$this->assertCount( 4, $result['date_query'] );
 		$this->assertFalse( $result['has_password'] );
-		$this->assertSame( 'OR', $result['date_query']['relation'] );
+		$this->assertSame( 'publish', $result['post_status'] );
+		$this->assertTrue( $result['ignore_sticky_posts'] );
+	}
+
+	/**
+	 * The editor sends `exactMatch=false` as a string, which must not count as true.
+	 *
+	 * Regression test: casting the string "false" to bool gave true, so the editor
+	 * preview showed exact-day matches while the site showed the whole week.
+	 */
+	public function test_filter_rest_query_reads_string_false_as_false(): void {
+		Functions\when( 'wp_timezone' )->justReturn( new DateTimeZone( 'UTC' ) );
+
+		$request = new \WP_REST_Request(
+			array(
+				'yearsBack'  => '1',
+				'exactMatch' => 'false',
+			)
+		);
+
+		$result = ( new Block() )->filter_rest_query( array( 'post_type' => 'post' ), $request );
+
+		$this->assertNotSame( $result['date_query'][0]['after'], $result['date_query'][0]['before'] );
 	}
 
 	/**
@@ -218,7 +329,7 @@ class BlockTest extends TestCase {
 	}
 
 	/**
-	 * Test that filter_rest_query with exactMatch produces inclusive date ranges.
+	 * Test that filter_rest_query with exactMatch produces single-day ranges.
 	 */
 	public function test_filter_rest_query_with_exact_match(): void {
 		Functions\when( 'wp_timezone' )->justReturn( new DateTimeZone( 'UTC' ) );
@@ -226,23 +337,16 @@ class BlockTest extends TestCase {
 		$request = new \WP_REST_Request(
 			array(
 				'yearsBack'  => 2,
-				'exactMatch' => true,
+				'exactMatch' => 'true',
 			)
 		);
 
 		$instance = new Block();
 		$result   = $instance->filter_rest_query( array( 'post_type' => 'post' ), $request );
 
-		$this->assertArrayHasKey( 'date_query', $result );
-		$this->assertFalse( $result['has_password'] );
-		$this->assertSame( 'OR', $result['date_query']['relation'] );
-		// 2 years back = 2 date ranges + relation.
 		$this->assertCount( 3, $result['date_query'] );
 
-		// Each date range should be inclusive with matching before/after dates.
 		for ( $i = 0; $i < 2; $i++ ) {
-			$this->assertArrayHasKey( 'inclusive', $result['date_query'][ $i ] );
-			$this->assertTrue( $result['date_query'][ $i ]['inclusive'] );
 			$this->assertSame( $result['date_query'][ $i ]['before'], $result['date_query'][ $i ]['after'] );
 		}
 	}
