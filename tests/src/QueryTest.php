@@ -109,63 +109,143 @@ class QueryTest extends TestCase {
 	}
 
 	/**
-	 * Test the structure of build_date_query with default (non-exact) matching.
+	 * Build a date query from a fixed day, in UTC.
+	 *
+	 * @param string $today       Day to look back from, Y-m-d.
+	 * @param int    $years_back  Years to look back.
+	 * @param bool   $exact_match Exact day or week window.
+	 *
+	 * @return array
 	 */
-	public function test_build_date_query_structure(): void {
-		Functions\when( 'wp_timezone' )->justReturn( new DateTimeZone( 'UTC' ) );
-
-		$result = Query::build_date_query( 3, false );
-
-		// Should have 3 date ranges + relation key.
-		$this->assertCount( 4, $result ); // 3 ranges + 'relation'
-		$this->assertSame( 'OR', $result['relation'] );
-
-		// Each range should have 'before' and 'after' keys.
-		for ( $i = 0; $i < 3; $i++ ) {
-			$this->assertArrayHasKey( 'before', $result[ $i ] );
-			$this->assertArrayHasKey( 'after', $result[ $i ] );
-			// Date format should be Y-m-d.
-			$this->assertMatchesRegularExpression( '/^\d{4}-\d{2}-\d{2}$/', $result[ $i ]['before'] );
-			$this->assertMatchesRegularExpression( '/^\d{4}-\d{2}-\d{2}$/', $result[ $i ]['after'] );
-		}
+	private function date_query_from( string $today, int $years_back, bool $exact_match ): array {
+		return Query::build_date_query(
+			$years_back,
+			$exact_match,
+			new \DateTimeImmutable( $today . ' 15:30:00', new DateTimeZone( 'UTC' ) )
+		);
 	}
 
 	/**
-	 * Test build_date_query with exact matching.
+	 * The week window covers the 7 days ending on today's date, today included.
+	 *
+	 * Regression test: the window used to stop the day before, so posts published
+	 * on this exact day in past years were left out.
+	 */
+	public function test_build_date_query_week_window_includes_today(): void {
+		$result = $this->date_query_from( '2026-11-20', 2, false );
+
+		$this->assertSame(
+			array(
+				array(
+					'after'     => '2025-11-14',
+					'before'    => '2025-11-20',
+					'inclusive' => true,
+				),
+				array(
+					'after'     => '2024-11-14',
+					'before'    => '2024-11-20',
+					'inclusive' => true,
+				),
+				'relation' => 'OR',
+			),
+			$result
+		);
+	}
+
+	/**
+	 * Exact matching uses a single inclusive day per year.
 	 */
 	public function test_build_date_query_exact_match(): void {
-		Functions\when( 'wp_timezone' )->justReturn( new DateTimeZone( 'UTC' ) );
+		$result = $this->date_query_from( '2026-11-20', 3, true );
 
-		$result = Query::build_date_query( 2, true );
-
-		// Should have 2 date ranges + relation key.
-		$this->assertCount( 3, $result ); // 2 ranges + 'relation'
+		$this->assertCount( 4, $result );
 		$this->assertSame( 'OR', $result['relation'] );
+		$this->assertSame(
+			array(
+				'after'     => '2023-11-20',
+				'before'    => '2023-11-20',
+				'inclusive' => true,
+			),
+			$result[2]
+		);
+	}
 
-		// Each range should be inclusive.
-		for ( $i = 0; $i < 2; $i++ ) {
-			$this->assertArrayHasKey( 'inclusive', $result[ $i ] );
-			$this->assertTrue( $result[ $i ]['inclusive'] );
-			// Before and after should be the same date (exact match).
-			$this->assertSame( $result[ $i ]['before'], $result[ $i ]['after'] );
+	/**
+	 * The current year is never part of the query.
+	 */
+	public function test_build_date_query_excludes_current_year(): void {
+		$result = $this->date_query_from( '2026-01-03', 5, false );
+
+		foreach ( array_filter( $result, 'is_array' ) as $range ) {
+			$this->assertLessThan( '2026-01-01', $range['before'] );
 		}
 	}
 
 	/**
-	 * Test build_date_query non-exact ranges span approximately 7 days.
+	 * Early in January, the week window reaches back into December of the previous year.
 	 */
-	public function test_build_date_query_non_exact_spans_week(): void {
-		Functions\when( 'wp_timezone' )->justReturn( new DateTimeZone( 'UTC' ) );
+	public function test_build_date_query_week_window_crosses_year_boundary(): void {
+		$result = $this->date_query_from( '2026-01-03', 1, false );
 
-		$result = Query::build_date_query( 1, false );
+		$this->assertSame( '2024-12-28', $result[0]['after'] );
+		$this->assertSame( '2025-01-03', $result[0]['before'] );
+	}
 
-		$before = new \DateTime( $result[0]['before'] );
-		$after  = new \DateTime( $result[0]['after'] );
-		$diff   = $before->diff( $after )->days;
+	/**
+	 * On 29 February, years without a leap day fall back to 28 February.
+	 *
+	 * Regression test: DateTime arithmetic used to turn 29 February into 1 March.
+	 */
+	public function test_build_date_query_leap_day_in_non_leap_years(): void {
+		$result = $this->date_query_from( '2028-02-29', 4, true );
 
-		// The span should be 7 days.
-		$this->assertSame( 7, $diff );
-		// Should NOT have inclusive key.
-		$this->assertArrayNotHasKey( 'inclusive', $result[0] );
+		$this->assertSame( array( '2027-02-28', '2027-02-28' ), array( $result[0]['after'], $result[0]['before'] ) );
+		$this->assertSame( array( '2026-02-28', '2026-02-28' ), array( $result[1]['after'], $result[1]['before'] ) );
+		$this->assertSame( array( '2024-02-29', '2024-02-29' ), array( $result[3]['after'], $result[3]['before'] ) );
+	}
+
+	/**
+	 * On 28 February of a non-leap year, leap years also include 29 February.
+	 */
+	public function test_build_date_query_includes_leap_day_on_28_february(): void {
+		$result = $this->date_query_from( '2027-02-28', 3, true );
+
+		// 2026 and 2025 have no leap day; 2024 does.
+		$this->assertSame( '2026-02-28', $result[0]['before'] );
+		$this->assertSame( '2025-02-28', $result[1]['before'] );
+		$this->assertSame( '2024-02-28', $result[2]['after'] );
+		$this->assertSame( '2024-02-29', $result[2]['before'] );
+	}
+
+	/**
+	 * In a leap year, 28 February is just 28 February.
+	 */
+	public function test_build_date_query_28_february_in_leap_year(): void {
+		$result = $this->date_query_from( '2028-02-28', 4, true );
+
+		$this->assertSame( '2024-02-28', $result[3]['before'] );
+	}
+
+	/**
+	 * Without an explicit day, "today" is computed in the site's timezone.
+	 */
+	public function test_build_date_query_defaults_to_today_in_site_timezone(): void {
+		$tz = new DateTimeZone( 'Pacific/Auckland' );
+		Functions\when( 'wp_timezone' )->justReturn( $tz );
+
+		$result = Query::build_date_query( 1, true );
+
+		$now = new \DateTimeImmutable( 'now', $tz );
+		$this->assertStringStartsWith(
+			sprintf( '%d-%s-', (int) $now->format( 'Y' ) - 1, $now->format( 'm' ) ),
+			$result[0]['before']
+		);
+	}
+
+	/**
+	 * Zero or negative years produce no date range at all.
+	 */
+	public function test_build_date_query_with_no_years(): void {
+		$this->assertSame( array( 'relation' => 'OR' ), $this->date_query_from( '2026-11-20', 0, false ) );
 	}
 }

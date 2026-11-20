@@ -11,6 +11,8 @@ namespace Jeherve\Posts_On_This_Day;
 
 use DateInterval;
 use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use WP_Query;
 
 /**
@@ -63,7 +65,6 @@ class Query {
 			return $cached_posts;
 		}
 
-		// Build the date query using the shared static method.
 		$date_query = self::build_date_query( $back, $exact_match );
 
 		// Make our query for posts.
@@ -77,48 +78,74 @@ class Query {
 	/**
 	 * Build a date query array for fetching posts "on this day" in previous years.
 	 *
+	 * Each past year gets its own inclusive range: either the exact day, or the
+	 * 7 days ending on that day. Dates are computed in the site's timezone, which
+	 * is also the timezone of the `post_date` column the query runs against.
+	 *
+	 * On 29 February, years without a leap day use 28 February instead. On 28 February
+	 * of a non-leap year, leap years also include 29 February, so those posts still
+	 * come up once a year.
+	 *
 	 * @since 2.0.0
 	 *
-	 * @param int  $years_back  How many years back to search.
-	 * @param bool $exact_match Whether to match the exact day (true) or within a week (false).
+	 * @param int                    $years_back  How many years back to search.
+	 * @param bool                   $exact_match Whether to match the exact day (true) or within a week (false).
+	 * @param DateTimeInterface|null $today       The day to look back from. Defaults to today in the site's timezone.
 	 *
 	 * @return array Date query array suitable for WP_Query's date_query parameter.
 	 */
-	public static function build_date_query( int $years_back, bool $exact_match ): array {
+	public static function build_date_query( int $years_back, bool $exact_match, ?DateTimeInterface $today = null ): array {
+		$today = null === $today
+			? new DateTimeImmutable( 'now', wp_timezone() )
+			: DateTimeImmutable::createFromInterface( $today );
+
+		$year  = (int) $today->format( 'Y' );
+		$month = (int) $today->format( 'n' );
+		$day   = (int) $today->format( 'j' );
+
 		$date_query = array();
 
-		// Loop to create an array of date ranges where we want to search for posts.
-		$i = 1;
-		while ( $years_back >= $i ) {
-			$today         = new DateTime( 'now', wp_timezone() );
-			$date_interval = sprintf( 'P%dY', $i );
+		for ( $i = 1; $i <= $years_back; $i++ ) {
+			$past_year = $year - $i;
+			$first_day = $day;
+			$last_day  = $day;
 
-			// This is either a week before, or the same day if you've chosen exact matching.
-			$after_interval = true === $exact_match
-				? 'P0D'
-				: 'P7D';
-
-			// Build the query for year iteration $i.
-			$this_year_query = array(
-				'before' => $today->sub( new DateInterval( $date_interval ) )->format( 'Y-m-d' ),
-				'after'  => $today->sub( new DateInterval( $after_interval ) )->format( 'Y-m-d' ),
-			);
-
-			// If we're doing an exact match, we need to be inclusive since we'll be looking for posts before and after the same date.
-			if ( true === $exact_match ) {
-				$this_year_query['inclusive'] = true;
+			if ( 2 === $month && 29 === $day && ! self::is_leap_year( $past_year ) ) {
+				$first_day = 28;
+				$last_day  = 28;
+			} elseif ( 2 === $month && 28 === $day && ! self::is_leap_year( $year ) && self::is_leap_year( $past_year ) ) {
+				$last_day = 29;
 			}
 
-			// Add that year to the overall date query args.
-			$date_query[] = $this_year_query;
+			$after  = $today->setDate( $past_year, $month, $first_day );
+			$before = $today->setDate( $past_year, $month, $last_day );
 
-			++$i;
+			if ( ! $exact_match ) {
+				$after = $after->sub( new DateInterval( 'P6D' ) );
+			}
+
+			$date_query[] = array(
+				'after'     => $after->format( 'Y-m-d' ),
+				'before'    => $before->format( 'Y-m-d' ),
+				'inclusive' => true,
+			);
 		}
 
 		// We are interested in posts for ANY of those dates.
 		$date_query['relation'] = 'OR';
 
 		return $date_query;
+	}
+
+	/**
+	 * Whether a year has a 29 February.
+	 *
+	 * @param int $year Year.
+	 *
+	 * @return bool
+	 */
+	private static function is_leap_year( int $year ): bool {
+		return ( 0 === $year % 4 && 0 !== $year % 100 ) || 0 === $year % 400;
 	}
 
 	/**
