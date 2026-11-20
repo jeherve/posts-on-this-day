@@ -70,6 +70,7 @@ class Block {
 		if (
 			isset( $parsed_block['attrs']['namespace'] )
 			&& self::VARIATION === $parsed_block['attrs']['namespace']
+			&& is_array( $parsed_block['attrs']['query'] ?? array() )
 		) {
 			$parsed_block['attrs']['query']['inherit'] = false;
 		}
@@ -233,8 +234,10 @@ class Block {
 	public function maybe_inject_year_headings( string $content, array $parsed_block, WP_Block $block ): string {
 		$query = $block->context['query'] ?? array();
 
+		// Content that already contains the marker (typed into a post) would make the split ambiguous.
 		if (
 			'' === $content
+			|| str_contains( $content, self::YEAR_MARKER )
 			|| ! is_array( $query )
 			|| ! array_key_exists( 'yearsBack', $query )
 			|| empty( $query['groupByYear'] )

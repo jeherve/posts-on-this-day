@@ -78,6 +78,20 @@ class BlockTest extends TestCase {
 	}
 
 	/**
+	 * Malformed markup with a non-array query is left alone instead of causing a fatal error.
+	 */
+	public function test_force_custom_query_ignores_non_array_query(): void {
+		$parsed_block = array(
+			'attrs' => array(
+				'namespace' => 'jeherve/posts-on-this-day',
+				'query'     => 'broken',
+			),
+		);
+
+		$this->assertSame( $parsed_block, ( new Block() )->force_custom_query( $parsed_block ) );
+	}
+
+	/**
 	 * Test that force_custom_query does not modify other blocks.
 	 */
 	public function test_force_custom_query_skips_other_blocks(): void {
@@ -457,9 +471,16 @@ class BlockTest extends TestCase {
 			),
 		);
 
+		$cases['marker already in content'] = array(
+			'yearsBack'   => 5,
+			'groupByYear' => true,
+		);
+		$content_with_marker                = '<ul>' . $this->item( 1, '1999' ) . '</ul>';
+
 		foreach ( $cases as $label => $query ) {
+			$html           = 'marker already in content' === $label ? $content_with_marker : $content;
 			$block->context = array( 'query' => $query );
-			$this->assertSame( $content, ( new Block() )->maybe_inject_year_headings( $content, array(), $block ), $label );
+			$this->assertSame( $html, ( new Block() )->maybe_inject_year_headings( $html, array(), $block ), $label );
 		}
 	}
 }
